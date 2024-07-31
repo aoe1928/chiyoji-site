@@ -65,4 +65,5 @@ const finalTheme = createTheme(theme, {
   },
 });
 
-export default finalTheme;
+// export default finalTheme;
+export default theme;
