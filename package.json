@@ -32,21 +32,16 @@
     "remark-gfm": "^4.0.0"
   },
   "devDependencies": {
-    "gh-pages": "^6.1.1",
-    "prettier": "^2.8.8"
+    "gh-pages": "^6.1.1"
   },
   "keywords": [
     "gatsby"
   ],
   "license": "0BSD",
   "scripts": {
-    "build": "gatsby build",
     "develop": "gatsby develop",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,css}\"",
-    "start": "gatsby develop",
-    "serve": "gatsby serve",
-    "clean": "gatsby clean",
-    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
+    "build": "gatsby build",
+    "deploy": "gatsby build && gh-pages -d public"
   },
   "repository": {
     "type": "git",
@@ -54,13 +49,5 @@
   },
   "bugs": {
     "url": "https://github.com/gatsbyjs/gatsby/issues"
-  },
-  "scripts": {
-    "develop": "gatsby develop",
-    "build": "gatsby build",
-    "deploy": "gatsby build && gh-pages -d public"
-  },
-  "devDependencies": {
-    "gh-pages": "^3.2.3"
   }
 }
