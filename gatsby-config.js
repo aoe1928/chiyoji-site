@@ -2,6 +2,7 @@ module.exports = {
   siteMetadata: {
     title: `ちよじのホームページ`,
   },
+  pathPrefix: "/chiyoji-site", // DNS設定やったら向こうにする 
   plugins: [
     `gatsby-plugin-image`,
     `gatsby-transformer-sharp`,
