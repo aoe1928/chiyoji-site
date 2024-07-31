@@ -37,4 +37,32 @@ const theme = createTheme({
   },
 });
 
-export default theme;
+const responsiveStyles = {
+  '.custom-image': {
+    maxWidth: '100%',
+    height: 'auto',
+    width: '100%', // デフォルトで幅100%
+    [theme.breakpoints.up('sm')]: {
+      width: '75%', // sm以上のサイズで幅75%
+    },
+    [theme.breakpoints.up('md')]: {
+      width: '50%', // md以上のサイズで幅50%
+    },
+    [theme.breakpoints.up('lg')]: {
+      width: '33.33%', // lg以上のサイズで幅33.33%
+    },
+  },
+  'a': {
+    color: '#4ecdc4', // チョコミントカラー
+  },
+};
+
+const finalTheme = createTheme(theme, {
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: responsiveStyles,
+    },
+  },
+});
+
+export default finalTheme;

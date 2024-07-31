@@ -4,7 +4,7 @@ import Layout from '../components/layout'
 const MusicPage: React.FC = () => (
   <Layout>
     <h1>音源紹介</h1>
-    <p>ここに音源の紹介...</p>
+    <p>暇なときにまとめます...</p>
   </Layout>
 )
 

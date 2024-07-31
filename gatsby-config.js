@@ -14,7 +14,7 @@ module.exports = {
           {
             resolve: `gatsby-remark-images`,
             options: {
-              maxWidth: 800,
+              maxWidth: 300,
             },
           },
         ],
@@ -35,6 +35,5 @@ module.exports = {
         path: `${__dirname}/src/images`,
       },
     },
-    `gatsby-transformer-remark`,
   ],
 };
