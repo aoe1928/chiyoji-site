@@ -5,14 +5,28 @@
   "version": "0.1.0",
   "author": "Kyle Mathews <mathews.kyle@gmail.com>",
   "dependencies": {
+    "@chakra-ui/react": "^2.8.2",
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
+    "@fontsource/roboto": "^5.0.13",
+    "@mdx-js/react": "^3.0.1",
+    "@mui/icons-material": "^5.16.5",
+    "@mui/material": "^5.16.5",
+    "@mui/styles": "^5.16.5",
+    "framer-motion": "^11.3.19",
     "gatsby": "^5.13.5",
     "gatsby-plugin-image": "^3.13.1",
     "gatsby-plugin-manifest": "^5.13.1",
+    "gatsby-plugin-mdx": "^5.13.1",
+    "gatsby-plugin-react-helmet": "^6.13.1",
     "gatsby-plugin-sharp": "^5.13.1",
+    "gatsby-remark-images": "^7.13.1",
     "gatsby-source-filesystem": "^5.13.1",
+    "gatsby-transformer-remark": "^6.13.1",
     "gatsby-transformer-sharp": "^5.13.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-helmet": "^6.1.0"
   },
   "devDependencies": {
     "prettier": "^2.8.8"
