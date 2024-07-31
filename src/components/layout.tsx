@@ -9,29 +9,26 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { makeStyles } from '@mui/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useTheme } from '@mui/material/styles';
+import { useTheme, styled } from '@mui/material/styles';
 
 type LayoutProps = {
   children: ReactNode;
 }
 
-const useStyles = makeStyles({
-  link: {
-    color: '#90caf9',
-    textDecoration: 'none',
-    marginRight: '1rem',
-  },
-  footer: {
-    marginTop: '2rem',
-    textAlign: 'center',
-  },
+const StyledLink = styled(Link)(({ theme }) => ({
+  color: '#90caf9',
+  textDecoration: 'none',
+  marginRight: '1rem',
+}));
+
+const Footer = styled('footer')({
+  marginTop: '2rem',
+  textAlign: 'center',
 });
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const classes = useStyles();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -87,10 +84,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </>
           ) : (
             <>
-              <Link to="/" className={classes.link}>トップページ</Link>
-              <Link to="/second-waltz" className={classes.link}>セカンドワルツ</Link>
-              <Link to="/about" className={classes.link}>自己紹介</Link>
-              <Link to="/music" className={classes.link}>音源紹介</Link>
+              <StyledLink to="/">トップページ</StyledLink>
+              <StyledLink to="/second-waltz">セカンドワルツ</StyledLink>
+              <StyledLink to="/about">自己紹介</StyledLink>
+              <StyledLink to="/music">音源紹介</StyledLink>
             </>
           )}
         </Toolbar>
@@ -99,11 +96,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <Box my={4}>
           <main>{children}</main>
         </Box>
-        <footer className={classes.footer}>
+        <Footer>
           <Typography variant="body2">
             © {new Date().getFullYear()} ちよじのホームページ
           </Typography>
-        </footer>
+        </Footer>
       </Container>
     </>
   );

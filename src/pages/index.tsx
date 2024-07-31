@@ -6,24 +6,24 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Button from '@mui/material/Button';
-import { makeStyles } from '@mui/styles';
+import { styled } from '@mui/material/styles';
 
-const useStyles = makeStyles({
-  blogTitle: {
-    fontSize: '1.8rem',
+const BlogTitle = styled('span')(({ theme }) => ({
+  fontSize: '1.8rem',
+}));
+
+const BlogDate = styled('span')(({ theme }) => ({
+  fontSize: '0.875rem',
+  color: 'gray',
+}));
+
+const MoreButton = styled(Button)(({ theme }) => ({
+  backgroundColor: '#7f8c8d', // 地味な色に設定
+  color: 'white',
+  '&:hover': {
+    backgroundColor: '#95a5a6', // ホバー時の色
   },
-  blogDate: {
-    fontSize: '0.875rem',
-    color: 'gray',
-  },
-  moreButton: {
-    backgroundColor: '#7f8c8d', // 地味な色に設定
-    color: 'white',
-    '&:hover': {
-      backgroundColor: '#95a5a6', // ホバー時の色
-    },
-  },
-});
+}));
 
 type Props = {
   data: {
@@ -46,7 +46,6 @@ type Props = {
 };
 
 const IndexPage: React.FC<Props> = ({ data }) => {
-  const classes = useStyles();
   const [visiblePosts, setVisiblePosts] = useState(5);
   const posts = data.allMdx.edges;
 
@@ -61,10 +60,10 @@ const IndexPage: React.FC<Props> = ({ data }) => {
         {posts.slice(0, visiblePosts).map(({ node }) => (
           <ListItem key={node.id} button component={Link} to={node.fields.slug}>
             <ListItemText
-              primary={<span className={classes.blogTitle}>{node.frontmatter.title}</span>}
+              primary={<BlogTitle>{node.frontmatter.title}</BlogTitle>}
               secondary={
                 <span>
-                  <span className={classes.blogDate}>{node.frontmatter.date}</span>
+                  <BlogDate>{node.frontmatter.date}</BlogDate>
                   <br />
                   {node.excerpt}
                 </span>
@@ -74,9 +73,9 @@ const IndexPage: React.FC<Props> = ({ data }) => {
         ))}
       </List>
       {visiblePosts < posts.length && (
-        <Button variant="contained" className={classes.moreButton} onClick={handleShowMore}>
+        <MoreButton variant="contained" onClick={handleShowMore}>
           More
-        </Button>
+        </MoreButton>
       )}
     </Layout>
   );
