@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkgatsby_starter_default=self.webpackChunkgatsby_starter_default||[]).push([[924],{2854:function(n,e,t){t.r(e);var a=t(6540),r=t(1524),s=t(1441);e.default=()=>a.createElement(r.o,{children:"\n# 見出し\nこれは**太字**です。\n- 箇条書き\n- 箇条書き\n- 箇条書き\n\n| ヘッダー1 | ヘッダー2 |\n| --------- | --------- |\n| セル1     | セル2     |\n",remarkPlugins:[s.A]})}}]);
+//# sourceMappingURL=component---src-pages-aaa-jsx-31268c490b0519dc08db.js.map
