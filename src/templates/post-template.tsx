@@ -22,6 +22,7 @@ type Props = {
       frontmatter: {
         title: string;
         date: string;
+        photo: string[];  // photoを配列として扱う
       };
       body: string;
       fields: {
@@ -42,7 +43,19 @@ const PostTemplate: React.FC<Props> = ({ data }) => {
     //   const url = `${process.env.GATSBY_SITE_URL}${fields.slug}`;
     const url = `https://aoe1928.com${fields.slug}`;
     const title = frontmatter.title;
+  // const photo = frontmatter.photo;
+  const { photo } = frontmatter;
     const classes = useStyles();
+
+    type FullWidthImageProps = {
+      src: string;
+      alt?: string;
+    };
+    
+    const FullWidthImage: React.FC<FullWidthImageProps> = ({ src, alt }) => (
+      <img src={src} alt={alt} style={{ width: '60%' }} />
+    );
+    
     const handleCopyToClipboard = () => {
         navigator.clipboard.writeText(url).then(() => {
             alert('URLがクリップボードにコピーされました');
@@ -66,6 +79,10 @@ const PostTemplate: React.FC<Props> = ({ data }) => {
           {body}
         </ReactMarkdown>
       </MDXProvider>
+      {/* {photo && <FullWidthImage src={photo} alt='' />} */}
+      {photo && photo.length > 0 && photo.map((imgSrc, index) => (
+        <FullWidthImage key={index} src={imgSrc} alt={`image-${index}`} />
+      ))}
       <Box mt={4} display="flex" justifyContent="center">
         <IconButton
           className={classes.shareButton}
@@ -107,6 +124,7 @@ export const query = graphql`
       frontmatter {
         title
         date(formatString: "YYYY-MM-DD")
+        photo  # ここを配列に変更
       }
       body
       fields {

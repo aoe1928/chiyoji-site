@@ -24,46 +24,34 @@ const theme = createTheme({
     h1: {
       fontFamily: 'Roboto, Arial, sans-serif',
       fontWeight: 700,
-      fontSize: '3rem', // フォントサイズを調整
+      fontSize: '3rem',
     },
     h2: {
       fontFamily: 'Roboto, Arial, sans-serif',
       fontWeight: 500,
-      fontSize: '1.5rem', // フォントサイズを調整
+      fontSize: '1.5rem',
     },
     subtitle1: {
-      fontSize: '0.875rem', // 日付のフォントサイズを調整
+      fontSize: '0.875rem',
     },
   },
-});
-
-const responsiveStyles = {
-  '.custom-image': {
-    maxWidth: '100%',
-    height: 'auto',
-    width: '100%', // デフォルトで幅100%
-    [theme.breakpoints.up('sm')]: {
-      width: '75%', // sm以上のサイズで幅75%
-    },
-    [theme.breakpoints.up('md')]: {
-      width: '50%', // md以上のサイズで幅50%
-    },
-    [theme.breakpoints.up('lg')]: {
-      width: '33.33%', // lg以上のサイズで幅33.33%
-    },
-  },
-  'a': {
-    color: '#4ecdc4', // チョコミントカラー
-  },
-};
-
-const finalTheme = createTheme(theme, {
   components: {
     MuiCssBaseline: {
-      styleOverrides: responsiveStyles,
+      styleOverrides: {
+        '.custom-image': {
+          maxWidth: '100%',
+          height: 'auto',
+          width: '100%', // デフォルトで幅100%
+          '@media (min-width:600px)': {
+            width: '75%', // sm以上のサイズで幅75%
+          },
+          '@media (min-width:960px)': {
+            width: '50%', // md以上のサイズで幅50%
+          },
+        },
+      },
     },
   },
 });
 
-// export default finalTheme;
 export default theme;
