@@ -43,7 +43,8 @@ const SecondWaltz: React.FC = () => {
           ちよじによるポッププログレバンドです。<br />
           サポートとして、現在古暮まちさんにボーカルをやってもらってます！
         </Typography>
-        <StyledImage src="https://pub-01fefff4e3b240f089003a1627fe087d.r2.dev/IMG_0584.png" alt="Second Waltz" />
+        {/* <StyledImage src="https://pub-01fefff4e3b240f089003a1627fe087d.r2.dev/IMG_0584.png" alt="Second Waltz" /> */}
+        <StyledImage src="https://pub-01fefff4e3b240f089003a1627fe087d.r2.dev/second_waltz_%E3%83%84%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88.jpg" alt="Second Waltz" />
       </Content>
       <Box mt={4}>
         <Typography variant="h2" gutterBottom>宣伝リンク</Typography>

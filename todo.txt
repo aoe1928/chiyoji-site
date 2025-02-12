@@ -1,0 +1,6 @@
+コマンド
+gatsby develop
+gatsby deploy
+
+* CSSのバグ直す
+* aoe1928のドメインに変える

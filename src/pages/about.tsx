@@ -5,6 +5,7 @@ import TwitterIcon from '@mui/icons-material/Twitter';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import MailIcon from '@mui/icons-material/Mail';
 import YouTubeIcon from '@mui/icons-material/YouTube';
+import { styled } from '@mui/material/styles';
 
 type IconLinkProps = {
   href: string;
@@ -17,6 +18,15 @@ const IconLink: React.FC<IconLinkProps> = ({ href, ariaLabel, children }) => (
     {children}
   </IconButton>
 );
+
+const StyledImage = styled('img')({
+  maxWidth: '200px',
+  width: '100%',
+  height: 'auto',
+  marginTop: '20px',
+  marginRight: '20px',
+  float: 'left',
+});
 
 const AboutPage: React.FC = () => (
   <Layout>
