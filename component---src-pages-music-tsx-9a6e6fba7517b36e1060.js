@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkgatsby_starter_default=self.webpackChunkgatsby_starter_default||[]).push([[56],{3910:function(e,t,l){l.r(t);var a=l(6540),u=l(5106);t.default=()=>a.createElement(u.A,null,a.createElement("h1",null,"音源紹介"),a.createElement("p",null,"暇なときにまとめます..."))}}]);
-//# sourceMappingURL=component---src-pages-music-tsx-9a6e6fba7517b36e1060.js.map

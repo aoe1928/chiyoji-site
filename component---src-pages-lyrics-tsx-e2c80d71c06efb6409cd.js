@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkgatsby_starter_default=self.webpackChunkgatsby_starter_default||[]).push([[731],{4987:function(e,t,a){a.r(t);var l=a(6540),r=a(8884),n=a(4073),c=a(4810),o=a(9067);t.default=()=>l.createElement(r.A,null,l.createElement(n.A,{variant:"h1",gutterBottom:!0},"歌詞一覧"),l.createElement(o.A,{mt:4},l.createElement(c.N_,{to:"/second-waltz/lyrics/lili-e-no-kimochi",style:{color:"#FFB6C1",textDecoration:"none",fontSize:"1.2rem"}},"リリィへの気もち")))}}]);
+//# sourceMappingURL=component---src-pages-lyrics-tsx-e2c80d71c06efb6409cd.js.map
