@@ -1,8 +1,8 @@
 module.exports = {
   siteMetadata: {
     title: `ちよじのホームページ`,
+    siteUrl: `https://www.aoe1928.com`,
   },
-  pathPrefix: "/chiyoji-site", // DNS設定やったら向こうにする 
   plugins: [
     `gatsby-plugin-image`,
     `gatsby-transformer-sharp`,
@@ -14,9 +14,7 @@ module.exports = {
         gatsbyRemarkPlugins: [
           {
             resolve: `gatsby-remark-images`,
-            options: {
-              maxWidth: 300,
-            },
+            options: { maxWidth: 300 },
           },
         ],
       },
@@ -34,6 +32,27 @@ module.exports = {
       options: {
         name: `images`,
         path: `${__dirname}/src/images`,
+      },
+    },
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        name: `locale`,
+        path: `${__dirname}/locales`,
+      },
+    },
+    {
+      resolve: `gatsby-plugin-react-i18next`,
+      options: {
+        localeJsonSourceName: `locale`,
+        languages: [`ja`, `en`],
+        defaultLanguage: `ja`,
+        siteUrl: `https://www.aoe1928.com`,
+        i18nextOptions: {
+          interpolation: { escapeValue: false },
+          keySeparator: false,
+          nsSeparator: false,
+        },
       },
     },
   ],

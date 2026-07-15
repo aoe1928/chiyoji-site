@@ -1,5 +1,6 @@
 import React, { ReactNode, useState } from 'react';
-import { useStaticQuery, graphql, Link } from 'gatsby';
+import { useStaticQuery, graphql } from 'gatsby';
+import { Link, useI18next } from 'gatsby-plugin-react-i18next';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -9,26 +10,26 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme, styled } from '@mui/material/styles';
+import { Helmet } from 'react-helmet';
+import Footer from './footer';
 
 type LayoutProps = {
   children: ReactNode;
 }
 
 const StyledLink = styled(Link)(({ theme }) => ({
-  color: '#90caf9',
+  color: '#FFB6C1', // 薄いピンク
   textDecoration: 'none',
   marginRight: '1rem',
 }));
 
-const Footer = styled('footer')({
-  marginTop: '2rem',
-  textAlign: 'center',
-});
-
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const { language } = useI18next();
+  const isEnglish = language === 'en';
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -53,12 +54,30 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <>
+      <Helmet>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
+        <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Dancing+Script&family=Lora&family=Lobster&display=swap" rel="stylesheet" />
+      </Helmet>
       <CssBaseline />
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" component="div">
-            {data.site.siteMetadata?.title || 'ちよじのホームページ'}
-          </Typography>
+          <Link to="/" language={language} style={{ textDecoration: 'none' }}>
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{
+                background: 'linear-gradient(to right, #66ff66, #FFB6C1)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                textFillColor: 'transparent',
+                fontWeight: 'bold',
+              }}
+            >
+              {isEnglish ? "Chiyoji's Website" : (data.site.siteMetadata?.title || 'ちよじのホームページ')}
+            </Typography>
+          </Link>
           <Box sx={{ flexGrow: 1 }} />
           {isMobile ? (
             <>
@@ -76,18 +95,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 open={Boolean(anchorEl)}
                 onClose={handleMenuClose}
               >
-                <MenuItem onClick={handleMenuClose} component={Link} to="/">トップページ</MenuItem>
-                <MenuItem onClick={handleMenuClose} component={Link} to="/search">ブログ検索</MenuItem>
-                <MenuItem onClick={handleMenuClose} component={Link} to="/about">自己紹介</MenuItem>
-                <MenuItem onClick={handleMenuClose} component={Link} to="/music">音源紹介</MenuItem>
+                <MenuItem sx={{ color: '#FFB6C1' }} onClick={handleMenuClose} component={Link} language={language} to="/">{isEnglish ? 'Home' : 'トップページ'}</MenuItem>
+                <MenuItem sx={{ color: '#FFB6C1' }} onClick={handleMenuClose} component={Link} language={language} to="/blog">{isEnglish ? 'Blog' : 'ブログ'}</MenuItem>
+                <MenuItem sx={{ color: '#FFB6C1' }} onClick={handleMenuClose} component={Link} language={language} to="/second-waltz">Second Waltz</MenuItem>
+                <MenuItem sx={{ color: '#FFB6C1' }} onClick={handleMenuClose} component={Link} language={language} to="/purgatorio">Purgatorio</MenuItem>
+                <MenuItem sx={{ color: '#FFB6C1' }} onClick={handleMenuClose} component={Link} language={language} to="/music">{isEnglish ? 'Music' : '楽曲紹介'}</MenuItem>
+                <MenuItem sx={{ color: '#FFB6C1' }} onClick={handleMenuClose} component={Link} language={language} to="/about">{isEnglish ? 'About' : '自己紹介'}</MenuItem>
               </Menu>
             </>
           ) : (
             <>
-              <StyledLink to="/">トップページ</StyledLink>
-              <StyledLink to="/second-waltz">セカンドワルツ</StyledLink>
-              <StyledLink to="/about">自己紹介</StyledLink>
-              <StyledLink to="/music">音源紹介</StyledLink>
+              <StyledLink language={language} to="/">{isEnglish ? 'Home' : 'トップページ'}</StyledLink>
+              <StyledLink language={language} to="/blog">{isEnglish ? 'Blog' : 'ブログ'}</StyledLink>
+              <StyledLink language={language} to="/second-waltz">Second Waltz</StyledLink>
+              <StyledLink language={language} to="/purgatorio">Purgatorio</StyledLink>
+              <StyledLink language={language} to="/music">{isEnglish ? 'Music' : '楽曲紹介'}</StyledLink>
+              <StyledLink language={language} to="/about">{isEnglish ? 'About' : '自己紹介'}</StyledLink>
             </>
           )}
         </Toolbar>
@@ -96,14 +119,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <Box my={4}>
           <main>{children}</main>
         </Box>
-        <Footer>
-          <Typography variant="body2">
-            © {new Date().getFullYear()} ちよじのホームページ
-          </Typography>
-        </Footer>
+        <Footer />
       </Container>
     </>
   );
 }
+
 
 export default Layout;

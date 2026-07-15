@@ -1,11 +1,13 @@
 import React from 'react';
-import { graphql, Link, PageProps } from 'gatsby';
+import { graphql, PageProps } from 'gatsby';
+import LocalizedLink from '../components/localized-link';
 import Layout from '../components/layout';
 import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import { makeStyles } from '@mui/styles';
+import { useI18next } from 'gatsby-plugin-react-i18next';
 
 const useStyles = makeStyles({
   blogTitle: {
@@ -34,6 +36,13 @@ type NodeProps = {
     date: string;
   };
   excerpt: string;
+  englishTranslation?: {
+    frontmatter: {
+      title: string;
+      date: string;
+    };
+    excerpt: string;
+  } | null;
 };
 
 type PageContextProps = {
@@ -47,32 +56,39 @@ const MonthlyArchiveTemplate: React.FC<PageProps<{}, PageContextProps>> = ({ pag
   const classes = useStyles();
   const posts = pageContext.posts;
   const month = pageContext.month;
+  const { language } = useI18next();
+  const isEnglish = language === 'en';
 
   return (
     <Layout>
       <div className={classes.sidebar}>
-        <Typography variant="h6" gutterBottom>アーカイブ</Typography>
+        <Typography variant="h6" gutterBottom>{isEnglish ? 'Archive' : 'アーカイブ'}</Typography>
         <List>
           {/* 他の月のリンクをここに追加 */}
         </List>
       </div>
       <div className={classes.content}>
-        <Typography variant="h1" gutterBottom>{month} のブログ記事</Typography>
+        <Typography variant="h1" gutterBottom>{isEnglish ? `Posts from ${month}` : `${month} のブログ記事`}</Typography>
         <List>
-          {posts.map(({ node }) => (
-            <ListItem key={node.id} button component={Link} to={node.fields.slug}>
+          {posts.map(({ node }) => {
+            const displayedPost = isEnglish && node.englishTranslation
+              ? node.englishTranslation
+              : node;
+            return (
+            <ListItem key={node.id} button component={LocalizedLink} to={node.fields.slug}>
               <ListItemText
-                primary={<span className={classes.blogTitle}>{node.frontmatter.title}</span>}
+                primary={<span className={classes.blogTitle}>{displayedPost.frontmatter.title}</span>}
                 secondary={
                   <span>
-                    <span className={classes.blogDate}>{node.frontmatter.date}</span>
+                    <span className={classes.blogDate}>{displayedPost.frontmatter.date}</span>
                     <br />
-                    {node.excerpt}
+                    {displayedPost.excerpt}
                   </span>
                 }
               />
             </ListItem>
-          ))}
+            );
+          })}
         </List>
       </div>
     </Layout>

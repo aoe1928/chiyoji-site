@@ -36,7 +36,7 @@ const MDXComponents = {
   hr: Divider,
   thematicBreak: Divider,
   // blockquote: Quote,
-  image: props => <Image maxW='100%' {...props} />,
+  image: props => <Image maxW='600px' w={['80%', '100%']} mx='auto' {...props} />,
   table: Table,
   // th: THead,
   th: Th,

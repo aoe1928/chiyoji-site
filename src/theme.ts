@@ -6,7 +6,7 @@ const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#90caf9',
+      main: '#FFB6C1', // 薄いピンク
     },
     secondary: {
       main: '#f48fb1',
