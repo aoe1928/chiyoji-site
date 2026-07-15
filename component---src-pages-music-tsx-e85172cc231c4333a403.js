@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkchiyoji_site=self.webpackChunkchiyoji_site||[]).push([[781],{8501:function(e,l,t){t.r(l);var n=t(7294),c=t(6078);l.default=()=>n.createElement(c.Z,null,n.createElement("h1",null,"音源紹介"),n.createElement("p",null,"暇なときにまとめます..."))}}]);
+//# sourceMappingURL=component---src-pages-music-tsx-e85172cc231c4333a403.js.map
