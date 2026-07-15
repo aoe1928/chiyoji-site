@@ -141,8 +141,12 @@ const BlogListTemplate: React.FC<Props> = ({ pageContext }) => {
       return matchesQuery && matchesCategory;
     });
   }, [allPosts, isEnglish, isFiltering, posts, query, selectedCategory]);
+  const visibleCategoryOptions = useMemo(() => categoryOptions.filter(({ categories }) => {
+    if (categories.length !== selectedCategory.length + 1) return false;
+    return selectedCategory.every((category, index) => categories[index] === category);
+  }), [categoryOptions, selectedCategory]);
 
-  const FilterPanel = () => (
+  const renderFilterPanel = () => (
     <Box>
       <TextField
         fullWidth
@@ -158,18 +162,46 @@ const BlogListTemplate: React.FC<Props> = ({ pageContext }) => {
       <Typography variant="subtitle2" sx={{ mt: 2, mb: 1, color: 'text.secondary' }}>
         {isEnglish ? 'Filter by tag' : 'タグで絞り込む'}
       </Typography>
+      {selectedCategory.length > 0 && (
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 0.5, mb: 1.25 }}>
+          {selectedCategory.map((category, index) => (
+            <React.Fragment key={selectedCategory.slice(0, index + 1).join('/')}>
+              {index > 0 && <Box component="span" sx={{ color: 'text.secondary' }}>›</Box>}
+              <Chip
+                label={getCategoryLabel(category, language)}
+                clickable
+                size="small"
+                color={index === selectedCategory.length - 1 ? 'success' : 'default'}
+                variant={index === selectedCategory.length - 1 ? 'filled' : 'outlined'}
+                onClick={() => setSelectedCategory(selectedCategory.slice(0, index + 1))}
+              />
+            </React.Fragment>
+          ))}
+          <Button
+            size="small"
+            onClick={() => setSelectedCategory(selectedCategory.slice(0, -1))}
+            sx={{ minWidth: 0, ml: 0.25, color: '#FFB6C1' }}
+          >
+            {isEnglish ? 'Back' : '戻る'}
+          </Button>
+        </Box>
+      )}
+      {visibleCategoryOptions.length > 0 && selectedCategory.length > 0 && (
+        <Typography variant="caption" sx={{ display: 'block', mb: 0.75, color: 'text.secondary' }}>
+          {isEnglish ? 'Choose a subtag' : '下のタグを選択'}
+        </Typography>
+      )}
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
-        {categoryOptions.map(({ categories, count }) => {
-          const selected = categories.join('/') === selectedCategory.join('/');
-          const label = categories.map(category => getCategoryLabel(category, language)).join(' › ');
+        {visibleCategoryOptions.map(({ categories, count }) => {
+          const category = categories[categories.length - 1];
+          const label = getCategoryLabel(category, language);
           return (
             <Chip
               key={categories.join('/')}
               label={`${label} (${count})`}
               clickable
-              color={selected ? 'success' : 'default'}
-              variant={selected ? 'filled' : 'outlined'}
-              onClick={() => setSelectedCategory(selected ? [] : categories)}
+              variant="outlined"
+              onClick={() => setSelectedCategory(categories)}
               sx={{ maxWidth: '100%', '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis' } }}
             />
           );
@@ -202,7 +234,7 @@ const BlogListTemplate: React.FC<Props> = ({ pageContext }) => {
             backgroundColor: 'rgba(255,255,255,0.025)',
           }}
         >
-          <FilterPanel />
+          {renderFilterPanel()}
         </Paper>
 
         <Box sx={{ minWidth: 0 }}>
@@ -237,7 +269,7 @@ const BlogListTemplate: React.FC<Props> = ({ pageContext }) => {
               {isEnglish ? 'Search & filter' : '検索・タグ絞り込み'}{isFiltering ? ` (${displayedPosts.length})` : ''}
             </Button>
             <Collapse in={mobileFiltersOpen}>
-              <Box sx={{ px: 2, pb: 2 }}><FilterPanel /></Box>
+              <Box sx={{ px: 2, pb: 2 }}>{renderFilterPanel()}</Box>
             </Collapse>
           </Paper>
 
