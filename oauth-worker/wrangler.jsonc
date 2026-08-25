@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
+  "name": "chiyoji-decap-oauth",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-25",
+  "workers_dev": true,
+  "vars": {
+    "SITE_ORIGIN": "https://www.aoe1928.com"
+  }
+}
