@@ -10,6 +10,8 @@ const categoryLabels: Record<string, Record<SiteLanguage, string>> = {
   'site-news': { ja: 'サイトのお知らせ', en: 'Site News' },
   lifestyle: { ja: 'ライフハック', en: 'Life Hacks' },
   technology: { ja: '技術', en: 'Technology' },
+  travel: { ja: '旅行', en: 'Travel' },
+  gadgets: { ja: 'ガジェット', en: 'Gadgets' },
 };
 
 export const getCategoryLabel = (category: string, language: string) => {

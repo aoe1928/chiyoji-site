@@ -1,0 +1,91 @@
+# Phase 1 is intentionally local-only. `decap-server` intercepts repository
+# access while developing, so no GitHub credentials are used at this stage.
+local_backend: true
+
+backend:
+  name: github
+  repo: aoe1928/chiyoji-site
+  branch: codex/decap-cms-trial
+
+locale: ja
+site_url: https://www.aoe1928.com
+display_url: https://www.aoe1928.com
+
+media_folder: static/images/blog
+public_folder: /images/blog
+
+slug:
+  encoding: unicode
+  clean_accents: true
+  sanitize_replacement: "-"
+
+collections:
+  - name: posts
+    label: ブログ記事
+    label_singular: 記事
+    description: 日本語の記事をMDXとして保存します。英語記事は試用対象外です。
+    folder: src/posts
+    create: true
+    delete: false
+    extension: mdx
+    format: frontmatter
+    slug: "{{year}}{{month}}{{day}}-{{slug}}"
+    summary: "{{title}} — {{date}}"
+    sortable_fields: [date, title]
+    editor:
+      preview: true
+    fields:
+      - label: タイトル
+        name: title
+        widget: string
+
+      - label: 公開日
+        name: date
+        widget: datetime
+        date_format: YYYY-MM-DD
+        time_format: false
+        format: YYYY-MM-DD
+
+      - label: 下書き
+        name: draft
+        widget: boolean
+        default: true
+        hint: オンの間は本番ビルドに含まれません。
+
+      - label: URL
+        name: slug
+        widget: string
+        required: false
+        pattern:
+          - "^/?[a-z0-9][a-z0-9-]*/?$"
+          - 半角英小文字・数字・ハイフンで入力してください（例：260826-rome-day-1）。
+        hint: 省略時はファイル名からURLを生成します。公開後は変更しないでください。
+
+      - label: 分類
+        name: categories
+        widget: select
+        multiple: true
+        required: false
+        min: 0
+        options:
+          - { label: 旅行, value: travel }
+          - { label: ガジェット, value: gadgets }
+          - { label: ライフハック, value: lifestyle }
+          - { label: 技術, value: technology }
+          - { label: 音楽, value: music }
+          - { label: セカンドワルツ, value: second-waltz }
+          - { label: Purgatorio, value: purgatorio }
+          - { label: ライブ, value: live }
+          - { label: グッズ, value: merchandise }
+          - { label: リリース, value: release }
+          - { label: サイトのお知らせ, value: site-news }
+        hint: 階層にする場合は大分類から順に選びます。
+
+      - label: 本文
+        name: body
+        widget: markdown
+        hint: 画像ボタンから公開用画像を追加できます。1枚2MBまでです。
+        media_library:
+          config:
+            # Keep originals elsewhere; this repository receives web-ready copies.
+            max_file_size: 2097152
