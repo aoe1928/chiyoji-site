@@ -2,6 +2,14 @@ const path = require('path');
 const { createFilePath } = require('gatsby-source-filesystem');
 const _ = require('lodash');
 
+exports.onCreateDevServer = ({ app }) => {
+  const adminIndex = path.resolve(__dirname, 'static/admin/index.html');
+
+  app.get(['/admin', '/admin/', '/admin/index.html'], (_request, response) => {
+    response.sendFile(adminIndex);
+  });
+};
+
 exports.createSchemaCustomization = ({ actions }) => {
   actions.createTypes(`
     type MdxFrontmatter {
