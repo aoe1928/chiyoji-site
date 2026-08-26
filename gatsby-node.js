@@ -83,6 +83,7 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
     ? allPosts
     : allPosts.filter(({ node }) => node.frontmatter.draft !== true);
   const postTemplate = path.resolve('./src/templates/post-template.tsx');
+  const draftPreviewIndexTemplate = path.resolve('./src/templates/draft-preview-index-template.tsx');
   const archiveTemplate = path.resolve('./src/templates/monthly-archive-template.tsx');
   const blogListTemplate = path.resolve('./src/templates/blog-list-template.tsx');
   const tagTemplate = path.resolve('./src/templates/tag-template.tsx');
@@ -103,7 +104,8 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
 
   // Preview pages are deliberately absent from every public list and archive.
   // Their client-side passphrase gate is a casual sharing barrier, not strong auth.
-  allPosts.forEach(({ node }) => {
+  const draftPosts = allPosts.filter(({ node }) => node.frontmatter.draft === true);
+  draftPosts.forEach(({ node }) => {
     actions.createPage({
       path: `/preview/${node.fields.previewSlug}`,
       component: postTemplate,
@@ -113,6 +115,18 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
         draftPreview: true,
       },
     });
+  });
+
+  actions.createPage({
+    path: '/preview/',
+    component: draftPreviewIndexTemplate,
+    context: {
+      drafts: draftPosts.map(({ node }) => ({
+        date: node.frontmatter.date,
+        previewSlug: node.fields.previewSlug,
+        title: node.frontmatter.title,
+      })),
+    },
   });
 
   const postsByMonth = _.groupBy(posts, ({ node }) =>
