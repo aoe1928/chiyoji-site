@@ -6,5 +6,12 @@
   "workers_dev": true,
   "vars": {
     "SITE_ORIGIN": "https://www.aoe1928.com"
+  },
+  "preview_urls": false,
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "enabled": true
+    }
   }
 }

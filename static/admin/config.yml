@@ -1,11 +1,14 @@
-# Phase 1 is intentionally local-only. `decap-server` intercepts repository
-# access while developing, so no GitHub credentials are used at this stage.
+# `decap-server` intercepts repository access on localhost. Remote editors use
+# the OAuth Worker below, so GitHub credentials never enter this repository.
 local_backend: true
 
 backend:
   name: github
   repo: aoe1928/chiyoji-site
   branch: codex/decap-cms-trial
+  base_url: https://chiyoji-decap-oauth.chiyoji0762.workers.dev
+  auth_endpoint: auth
+  site_domain: www.aoe1928.com
 
 locale: ja
 site_url: https://www.aoe1928.com
