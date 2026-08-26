@@ -33,6 +33,7 @@ collections:
     extension: mdx
     format: frontmatter
     slug: "{{year}}{{month}}{{day}}-{{slug}}"
+    preview_path: "preview/{{slug}}"
     summary: "{{title}} — {{date}}"
     sortable_fields: [date, title]
     editor:
@@ -53,7 +54,7 @@ collections:
         name: draft
         widget: boolean
         default: true
-        hint: オンの間は本番ビルドに含まれません。
+        hint: オンの間は公開一覧と通常URLに出ません。保存後、画面上部のプレビューリンクから合言葉付き表示を確認できます。
 
       - label: URL
         name: slug

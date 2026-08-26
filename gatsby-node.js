@@ -31,6 +31,15 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
     node,
     value: node.frontmatter.slug || createFilePath({ node, getNode }),
   });
+
+  const sourceFile = getNode(node.parent);
+  if (sourceFile && sourceFile.relativePath) {
+    actions.createNodeField({
+      name: 'previewSlug',
+      node,
+      value: path.basename(sourceFile.relativePath, path.extname(sourceFile.relativePath)),
+    });
+  }
 };
 
 exports.createPages = async ({ graphql, actions, reporter }) => {
@@ -42,6 +51,7 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
             id
             fields {
               slug
+              previewSlug
             }
             frontmatter {
               title
@@ -88,6 +98,20 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
       path: node.fields.slug,
       component: postTemplate,
       context: { id: node.id, slug: node.fields.slug },
+    });
+  });
+
+  // Preview pages are deliberately absent from every public list and archive.
+  // Their client-side passphrase gate is a casual sharing barrier, not strong auth.
+  allPosts.forEach(({ node }) => {
+    actions.createPage({
+      path: `/preview/${node.fields.previewSlug}`,
+      component: postTemplate,
+      context: {
+        id: node.id,
+        slug: node.fields.slug,
+        draftPreview: true,
+      },
     });
   });
 
