@@ -4,6 +4,7 @@ module.exports = {
     siteUrl: `https://www.aoe1928.com`,
   },
   plugins: [
+    `gatsby-plugin-react-helmet`,
     `gatsby-plugin-image`,
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
