@@ -33,6 +33,7 @@ collections:
     extension: mdx
     format: frontmatter
     slug: "{{year}}{{month}}{{day}}-{{slug}}"
+    preview_path: "preview/"
     summary: "{{title}} — {{date}}"
     sortable_fields: [date, title]
     editor:
@@ -53,7 +54,7 @@ collections:
         name: draft
         widget: boolean
         default: true
-        hint: オンの間は本番ビルドに含まれません。
+        hint: オンの間は公開一覧と通常URLに出ません。保存後は https://www.aoe1928.com/preview/ の下書き一覧へ自動で追加されます。
 
       - label: URL
         name: slug
@@ -62,7 +63,7 @@ collections:
         pattern:
           - "^/?[a-z0-9][a-z0-9-]*/?$"
           - 半角英小文字・数字・ハイフンで入力してください（例：260826-rome-day-1）。
-        hint: 省略時はファイル名からURLを生成します。公開後は変更しないでください。
+        hint: 基本は空欄で大丈夫です。ファイル名から公開URLを自動生成します。公開後は変更しないでください。
 
       - label: 分類
         name: categories
