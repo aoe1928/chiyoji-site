@@ -8,3 +8,13 @@ body img {
   margin: 24px auto !important;
   object-fit: contain;
 }
+
+body img + .cms-image-title {
+  display: block;
+  width: min(520px, calc(100% - 32px));
+  margin: -14px auto 24px;
+  color: #555;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  text-align: center;
+}

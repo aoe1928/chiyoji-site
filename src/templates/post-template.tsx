@@ -68,9 +68,10 @@ const PostTemplate: React.FC<Props> = ({ data, pageContext }) => {
     type FullWidthImageProps = {
       src: string;
       alt?: string;
+      title?: string;
     };
 
-    const ArticleImage: React.FC<FullWidthImageProps> = ({ src, alt }) => (
+    const ArticleImage: React.FC<FullWidthImageProps> = ({ src, alt, title }) => (
       <Box
         component="span"
         sx={{
@@ -110,7 +111,8 @@ const PostTemplate: React.FC<Props> = ({ data, pageContext }) => {
           <Box
             component="img"
             src={src}
-            alt={alt || ''}
+            alt={alt || title || ''}
+            title={title}
             loading="lazy"
             sx={{
               display: 'block',
@@ -124,20 +126,20 @@ const PostTemplate: React.FC<Props> = ({ data, pageContext }) => {
             }}
           />
         </Box>
-        {alt && (
+        {title && (
           <Typography
             component="span"
             variant="caption"
             sx={{ display: 'block', mt: 1.25, color: 'text.secondary', lineHeight: 1.5 }}
           >
-            {alt}
+            {title}
           </Typography>
         )}
       </Box>
     );
 
-    const FullWidthImage: React.FC<FullWidthImageProps> = ({ src, alt }) => (
-      <ArticleImage src={src} alt={alt} />
+    const FullWidthImage: React.FC<FullWidthImageProps> = ({ src, alt, title }) => (
+      <ArticleImage src={src} alt={alt} title={title} />
     );
     
     const handleCopyToClipboard = () => {
