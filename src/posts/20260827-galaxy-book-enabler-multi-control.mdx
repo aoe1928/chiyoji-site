@@ -35,15 +35,20 @@ Samsungの「Multi Control」は、PCのキーボードとマウスを使ってG
 
 ## 検証環境
 
-今回使用したPCは次の構成です。
+今回使用したPCは次の構成です（自作PC）。
 
 | 項目 | 内容 |
 |---|---|
-| PCメーカー | ASUS |
-| PCモデル表示 | System Product Name |
-| OS | Windows 11 Pro（Build 26200） |
+| PCタイプ | 自作PC |
+| マザーボード | ASUS ROG Crosshair VIII Dark Hero（表示: System Product Name） |
 | CPU | AMD Ryzen 9 5950X 16-Core Processor |
-| メモリ | 約63.91GB |
+| CPUクーラー | Arctic Liquid Freezer III Pro 280 A-RGB |
+| GPU | MSI GeForce RTX 5060 Ti 16G VENTUS 2X OC PLUS |
+| メモリ | Patriot Viper Steel DDR4 3600MHz 64GB (32GB×2) |
+| ストレージ | WD_BLACK SN850X 2TB |
+| PCケース | Fractal Design Pop Air RGB Black TG |
+| 電源 | 850W VITA GM |
+| OS | Windows 11 Pro（Build 26200） |
 | Wi-Fi | Intel Wi-Fi 6 AX200 160MHz |
 | Bluetooth | Intel Wireless Bluetooth |
 | Galaxy Book Enabler | 3.1.5 |
@@ -53,7 +58,7 @@ Multi ControlやQuick ShareではWi-FiとBluetoothの構成が重要です。今
 
 ## 事前に用意したもの
 
-Galaxy Book Enablerのファイルは、次の場所に展開済みでした。
+Galaxy Book Enabler（[GitHub: Bananz0/GalaxyBookEnabler](https://github.com/Bananz0/GalaxyBookEnabler)）のファイルは、次の場所に展開済みでした。
 
 ```text
 C:\GalaxyBookEnabler-main
@@ -412,9 +417,15 @@ cd C:\GalaxyBookEnabler-main
 - Windows UpdateやSamsungアプリのアップデートで動かなくなる可能性があります。
 - Galaxy Book Enablerの更新後は設定の再適用が必要になる場合があります。
 - PC構成が異なれば、同じプロファイルやSSSE戦略で同じ結果になるとは限りません。
-- Quick Shareなど一部機能は、Wi-Fi／ブログへ公開する際は、Bluetoothチップやドライバーの相性に左右されます。
+- Quick Shareなど一部機能は、Wi-Fi／Bluetoothチップやドライバーの相性に左右されます。
 - セキュリティソフトを一時停止する方法はリスクがあるため、今回の作業では行っていません。
 - 実行ポリシーをシステム全体で `Unrestricted` に変更する方法も採用していません。PowerShell起動時の `-ExecutionPolicy Bypass` を対象プロセスに限定して使用しました。
+
+## 参考リンク
+
+- [YouTube: How to Install Samsung Apps on ANY Windows PC (Galaxy Book Enabler)](https://www.youtube.com/watch?v=gu84-uucvDk)
+- [GitHub: Bananz0/GalaxyBookEnabler](https://github.com/Bananz0/GalaxyBookEnabler)
+- [GitHub: PowerShell/PowerShell Releases](https://github.com/PowerShell/PowerShell/releases)
 
 ## まとめ
 
@@ -439,6 +450,6 @@ cd C:\GalaxyBookEnabler-main
 - [ ] `%USERPROFILE%`へ置換し、Windowsユーザー名を伏せる
 - [ ] ログやスクリーンショットにメールアドレス、Samsung Account名、端末名が映っていないか確認する
 - [ ] 使用したGalaxy端末の機種名とOSバージョンを必要に応じて追記する
-- [ ] Galaxy Book EnablerのリポジトリURLと参照日を追記する
+- [x] Galaxy Book EnablerのリポジトリURLと参考動画URLを追記する
 - [ ] 非公式ツールである旨と自己責任の注意書きを残す
 - [ ] 公開時点でバージョンや配布ファイルが変わっていないか再確認する
