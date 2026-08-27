@@ -3,7 +3,22 @@
   const observedFrames = new WeakMap();
   const watchedFrames = new WeakSet();
 
+  const normalizeImageSrc = image => {
+    const source = (image.getAttribute('src') || '').replace(/\\/g, '/');
+    let pathname = source;
+    try {
+      pathname = new URL(source, image.ownerDocument.baseURI).pathname;
+    } catch (_error) {
+      // The original source below is still enough for normal relative paths.
+    }
+    const staticMedia = source.match(/^(?:\/)?static\/images\/blog\/(.+)$/i);
+    const nestedStaticMedia = pathname.match(/^\/preview\/[^/]+\/static\/images\/blog\/(.+)$/i);
+    const match = staticMedia || nestedStaticMedia;
+    if (match) image.setAttribute('src', `/images/blog/${match[1]}`);
+  };
+
   const syncImageCaption = image => {
+    normalizeImageSrc(image);
     const title = (image.getAttribute('title') || '').trim();
     const nextElement = image.nextElementSibling;
     const currentCaption = nextElement?.classList.contains(captionClass)
@@ -48,7 +63,7 @@
       const observer = new MutationObserver(() => syncDocument(documentRef));
       observer.observe(documentRef.documentElement, {
         attributes: true,
-        attributeFilter: ['title'],
+        attributeFilter: ['src', 'title'],
         childList: true,
         subtree: true,
       });
