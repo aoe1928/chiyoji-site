@@ -1,0 +1,444 @@
+---
+title: "非Samsung製Windows PCにGalaxy Book Enablerを導入してMulti Controlを使えるようにした記録"
+date: "2026-08-27"
+draft: true
+slug: "galaxy-book-enabler-multi-control"
+categories:
+  - technology
+  - gadgets
+---
+
+## はじめに
+
+Samsungの「Multi Control」は、PCのキーボードとマウスを使ってGalaxyスマートフォンやタブレットを操作できる機能です。本来は対応するGalaxy Book向けの機能ですが、今回は非Samsung製のWindows PCにオープンソースの「Galaxy Book Enabler」を導入し、Multi Controlが実際に動作するところまで確認しました。
+
+この記事は一般論だけで書いた手順ではなく、2026年8月26日に実機で行った作業、確認できたバージョン、発生したエラー、最終的な検証結果をもとにまとめた記録です。
+
+> [!warning] 重要
+> Galaxy Book EnablerはSamsungやMicrosoftの公式ツールではありません。非Samsung PCをGalaxy Bookとして認識させ、Samsung向けサービスやドライバーを動作させる非公式ツールです。レジストリ、サービス、ドライバー、タスクスケジューラ、Microsoft Storeアプリに変更が入ります。実行する場合は、内容を確認したうえで自己責任で行ってください。
+
+## 今回の結果
+
+最初に結論を書くと、導入自体は正常に完了し、Windowsを一度「再起動」したあとにMulti Controlが動作しました。
+
+確認できた内容は次のとおりです。
+
+- Galaxy Book Enabler 3.1.5のインストール成功
+- PowerShell 7.6.5の導入成功
+- Multi Control 2.7.1300.0のAppX登録を確認
+- Samsung Account、Samsung Continuity Service、Samsung Settings Runtimeを確認
+- Galaxy Book Enablerのサービスが自動起動状態で稼働
+- Multi Control関連サービスが自動起動状態で稼働
+- 起動時タスク2件の登録を確認
+- Intel Wi-Fi 6 AX200とIntel Bluetoothの検出を確認
+- 最終的にGalaxy端末とのMulti Control接続・操作に成功
+
+## 検証環境
+
+今回使用したPCは次の構成です。
+
+| 項目 | 内容 |
+|---|---|
+| PCメーカー | ASUS |
+| PCモデル表示 | System Product Name |
+| OS | Windows 11 Pro（Build 26200） |
+| CPU | AMD Ryzen 9 5950X 16-Core Processor |
+| メモリ | 約63.91GB |
+| Wi-Fi | Intel Wi-Fi 6 AX200 160MHz |
+| Bluetooth | Intel Wireless Bluetooth |
+| Galaxy Book Enabler | 3.1.5 |
+| PowerShell | 7.6.5 x64 |
+
+Multi ControlやQuick ShareではWi-FiとBluetoothの構成が重要です。今回のPCでは、インストーラーのハードウェア検出でIntel AX200とIntel Bluetoothの両方が認識されました。
+
+## 事前に用意したもの
+
+Galaxy Book Enablerのファイルは、次の場所に展開済みでした。
+
+```text
+C:\GalaxyBookEnabler-main
+```
+
+主要なファイルは以下です。
+
+```text
+C:\GalaxyBookEnabler-main\README.md
+C:\GalaxyBookEnabler-main\Explainer.md
+C:\GalaxyBookEnabler-main\Install-GalaxyBookEnabler.ps1
+```
+
+実際に実行したのは `Install-GalaxyBookEnabler.ps1` です。動画の説明文に書かれているコマンドをそのまま実行するのではなく、リポジトリ内のREADME、Explainer、スクリプトのパラメーターを先に確認しました。
+
+確認の結果、Galaxy Book Enabler 3.1.5はWindows標準のWindows PowerShell 5.1ではなく、PowerShell 7.0以上を必要としていました。また、スクリプト自身に管理者権限への昇格処理、テストモード、完全自動モード、アンインストール機能が実装されていることも確認しました。
+
+## 手順1：PowerShell 7の有無を確認
+
+最初にPC側の状態を調べたところ、通常の場所にはPowerShell 7がインストールされていませんでした。
+
+```text
+C:\Program Files\PowerShell\7\pwsh.exe → 未導入
+winget → 利用不可
+Microsoft Desktop App Installer → 未導入
+```
+
+作業環境内部にはPowerShell 7相当のランタイムがありましたが、Galaxy Book Enablerが作成する自動起動タスクから内部ランタイムを参照させるのは適切ではありません。そのため、PCへ正式版のPowerShell 7をインストールすることにしました。
+
+## 手順2：Microsoft公式のPowerShell 7を導入
+
+Microsoft公式のPowerShell GitHub Releasesから、当時の最新版であるPowerShell 7.6.5 x64 MSIを取得しました。
+
+```text
+ファイル名: PowerShell-7.6.5-win-x64.msi
+SHA-256: 3A87C24E044EC792047D734C841917EE4323A535E25F645AE6C33141A35FCA8D
+```
+
+ダウンロード後、ローカルファイルのSHA-256を公式リリースページの公開値と照合し、一致することを確認してから実行しました。
+
+### 最初のMSI実行は失敗
+
+最初の実行では、Windows Installerが終了コード `1603` を返しました。詳細ログを有効にして再確認すると、実際の原因は次のエラーでした。
+
+```text
+Error 1925. You do not have sufficient privileges to complete this installation for all users of the machine.
+```
+
+つまり、MSIの破損やOSの非互換ではなく、全ユーザー向けインストールに必要な管理者権限が不足していました。
+
+そこで、MSIをUAC昇格付きで起動し直しました。UAC画面で許可したあとは終了コード `0` となり、次の場所への導入を確認できました。
+
+```text
+C:\Program Files\PowerShell\7\pwsh.exe
+```
+
+バージョン確認結果は次のとおりです。
+
+```text
+7.6.5
+```
+
+実際の導入では、PATHへの追加、エクスプローラーのコンテキストメニュー、Microsoft Updateへの登録も有効にしました。一方、PowerShell Remotingは有効化していません。
+
+## 手順3：PCの互換性を確認
+
+管理者権限でPCとネットワークアダプターを確認しました。
+
+```text
+Manufacturer : ASUS
+Model        : System Product Name
+Wi-Fi        : Intel(R) Wi-Fi 6 AX200 160MHz
+Bluetooth    : Intel(R) Wireless Bluetooth(R)
+```
+
+Galaxy Book Enabler自身のログでも、以下のハードウェアIDを含めて正常に検出されました。
+
+```text
+Wi-Fi: PCI\VEN_8086&DEV_2723&SUBSYS_00848086&REV_1A
+Bluetooth: USB\VID_8087&PID_0029&REV_0001
+```
+
+ただし、インストーラーからはIntel Wi-Fiドライバーに関する警告が出ました。
+
+```text
+For best Samsung app compatibility, keep Intel Wi-Fi drivers on v23 and avoid v24 until Samsung updates their SDK.
+```
+
+これは今回のインストール失敗ではなく、将来的な互換性に関する注意です。今回の作業ではWi-Fiドライバーの変更やダウングレードは行っていません。
+
+## 手順4：Galaxy Book Enablerを完全自動モードで実行
+
+今回は対話式メニューではなく、選択内容を明示した完全自動モードで実行しました。構成は次のとおりです。
+
+| 設定 | 選択内容 |
+|---|---|
+| 動作 | Install |
+| 偽装プロファイル | Galaxy Book4 Pro |
+| アプリ構成 | Recommended |
+| SSSE | インストールする |
+| SSSE戦略 | Dual |
+| パッケージ確認 | 承認済みとして続行 |
+| AI Selectショートカット | 作成しない |
+| ログ出力先 | `C:\GalaxyBook\Logs` |
+
+実行したコマンドは次の構成です。
+
+```powershell
+& "C:\Program Files\PowerShell\7\pwsh.exe" `
+  -NoProfile `
+  -ExecutionPolicy Bypass `
+  -File "C:\GalaxyBookEnabler-main\Install-GalaxyBookEnabler.ps1" `
+  -FullyAutonomous `
+  -AutonomousAction Install `
+  -AutonomousModel Book4Pro `
+  -AutonomousPackageProfile Recommended `
+  -AutonomousInstallSsse:$true `
+  -AutonomousSsseStrategy Dual `
+  -AutonomousConfirmPackages:$true `
+  -AutonomousCreateAiSelectShortcut:$false `
+  -LogDirectory "C:\GalaxyBook\Logs"
+```
+
+この処理ではUAC昇格を行い、Samsung向けドライバー、サービス、タスク、Microsoft Storeパッケージを順番に導入しました。今回の環境では全体で約10分かかりました。ネットワーク速度やMicrosoft Store側の応答により、所要時間は変わります。
+
+## 導入された主なコンポーネント
+
+### Core側
+
+- Samsung Account
+- Samsung Settings
+- Samsung Settings Runtime
+- Samsung Cloud関連コンポーネント
+- Knox Matrix for Windows
+- Galaxy Connect
+- Samsung Intelligence Service
+- Samsung Bluetooth Sync
+- Galaxy Book Experience
+
+### Recommended側
+
+- Quick Share
+- Camera Share
+- Storage Share
+- Multi Control
+- Nearby Devices
+- Samsung Notes
+- AI Select
+- Samsung Gallery
+- Galaxy Buds
+- Samsung Pass
+- Second Screen
+
+インストールログ上では、Samsung Settings Runtime、Samsung Cloud、Knox Matrix、Samsung Intelligence Service、Samsung Bluetooth Sync、Galaxy Book Experience、Quick Share、Camera Share、Storage Share、Nearby Devices、Samsung Notes、AI Select、Samsung Gallery、Galaxy Buds、Samsung Pass、Second Screenの成功記録を確認しました。
+
+Multi Control、Samsung Account、Samsung Continuity Service、Samsung Settingsについては、インストール後に全ユーザーのAppX登録を管理者権限で列挙し、正常に登録されていることを別途確認しました。
+
+確認できた主なパッケージバージョンは以下です。
+
+| パッケージ | 確認したバージョン |
+|---|---:|
+| Multi Control | 2.7.1300.0 |
+| Samsung Continuity Service | 2.1.11.0 |
+| Samsung Account | 1.26.6021.0 |
+| Samsung Settings Runtime | 7.0.6.0 |
+| Samsung Settings | 8.0.13.0 |
+| Samsung Quick Share | 2.3.22.0 |
+| Samsung Notes | 4.3.826.0 |
+| Galaxy Buds | 6.9.8.0 |
+| Second Screen | 1.15.3.0 |
+
+## SSSEとドライバーの確認
+
+SSSE（Samsung System Support Engine）関連ファイルは次の場所へ配置されました。
+
+```text
+C:\GalaxyBook
+```
+
+主なファイルとして以下を確認しました。
+
+```text
+SamsungSystemSupportEngine.exe
+SamsungSystemSupportService.exe
+SamsungSystemSupportOSD.exe
+SamsungActiveScreen.exe
+SettingsEngineTest.exe
+SFourSWComp15.inf
+```
+
+Windows Driver Store側ではSamsung提供のSoftwareComponentドライバーも確認できました。
+
+```text
+Provider: Samsung
+Original Name: sfourswcomp15.inf
+Driver Version: 8.0.5.0
+Published Name: oem47.inf
+```
+
+既存のSamsung USB／Modem系ドライバーも列挙されましたが、それらすべてが今回新規導入されたとまでは断定していません。ここでは、SSSEで使用するSoftwareComponentドライバーの存在を確認した、という範囲に留めます。
+
+## 自動起動の仕組み
+
+Galaxy Book Enablerは、インストール時だけ実行して終わる構成ではありません。タスクスケジューラに2件の自動起動タスクが登録されました。
+
+### 1. `GalaxyBookEnabler`
+
+- トリガー: Windows起動時
+- 遅延: 10秒
+- 実行ユーザー: `NT AUTHORITY\SYSTEM`
+- 実行レベル: 最上位
+- 役割: Galaxy Bookとして認識させる設定を起動ごとに適用
+- 実行ファイル: `C:\Users\aoe1928\.galaxy-book-enabler\GalaxyBookSpoof.bat`
+
+### 2. `GalaxyBookEnabler-MultiControlInit`
+
+- トリガー: Windows起動時
+- タスク側の遅延: 5分
+- スクリプト内部の待機: 60秒
+- 実行ユーザー: `NT AUTHORITY\SYSTEM`
+- 実行レベル: 最上位
+- 役割: Samsung関連サービスを再起動してMulti Controlの安定性を高める
+- 実行スクリプト: `C:\Users\aoe1928\.galaxy-book-enabler\Init-SamsungMultiControlOnLogin.ps1`
+
+つまり、Multi Controlの安定化処理が終わるのはWindows起動からおよそ6分後です。起動直後に端末が見つからなくても、数分待つと状況が変わる可能性があります。
+
+実際の初回ログでは、次のサービスを再起動し、すべて成功していました。
+
+```text
+Samsung Intelligence Service
+Samsung Multi Control Service
+SamsungAccountService
+SamsungContinuityWindowsService
+```
+
+## インストール後の検証
+
+インストーラーの終了コードは `0` でした。最終ログにも次の記録があります。
+
+```text
+Version: 3.1.5
+Install Path: C:\Users\aoe1928\.galaxy-book-enabler
+Task Name: GalaxyBookEnabler
+Installation completed successfully at 2026-08-26 22:32:48
+```
+
+管理者権限で確認した時点では、以下のサービスが稼働していました。
+
+```text
+Galaxy Book Enabler Support Service : Running / Automatic
+Galaxy Book Experience              : Running / Automatic
+Samsung Intelligence Service        : Running / Automatic
+Samsung Multi Control Service       : Running / Automatic
+Samsung Account Service             : Running / Manual
+```
+
+AppXパッケージの状態値も正常状態として取得でき、Multi ControlのUIプロセス、ヘルパー、サービスプロセスが起動していることも確認できました。
+
+## 最初は「うまくいかない」状態だった
+
+インストール自体は成功していましたが、直後はMulti Controlが期待どおりに動きませんでした。
+
+その時点でプロセスを調べると、Multi Control本体とサービスは起動していた一方、`GalaxyConnectWinUI` はインストール前日の2026年8月25日から動作し続けていました。つまり、インストール前から存在したGalaxy Connectプロセスが残ったままで、新しく導入されたSSSEやGalaxy Book偽装設定を読み直していない可能性が高い状態でした。
+
+そこで、Windowsを「シャットダウンして起動」ではなく、明示的に「再起動」しました。再起動後は正常に動作しました。
+
+Windowsでは高速スタートアップの影響で、シャットダウン後も一部状態が完全にリセットされない場合があります。そのため、この種のドライバーやサービスを導入した直後は「再起動」を選ぶのが確実です。
+
+## Multi Controlの設定と使い方
+
+再起動後は、次の順序で設定しました。
+
+1. PC側でSamsung Accountにログインする。
+2. Galaxyスマートフォン／タブレット側でも同じSamsung Accountにログインする。
+3. PCとGalaxy端末のWi-Fi、Bluetoothをオンにする。
+4. Galaxy端末で `設定 → 接続デバイス → マルチコントロール` をオンにする。
+5. PCで「Multi Control」を起動する。
+6. 表示された端末を選択して接続する。
+7. Multi Control画面でPCと端末の位置関係を設定する。
+8. 設定した方向の画面端へマウスポインターを移動する。
+
+正常に接続すると、PCのキーボードとマウスでGalaxy端末を操作できます。対応する組み合わせでは、クリップボード共有やファイルのドラッグ＆ドロップも利用できます。
+
+## うまく接続できない場合の確認順序
+
+今回の経験を踏まえると、次の順番で確認すると切り分けやすいです。
+
+1. インストール後にWindowsを明示的に再起動したか。
+2. Windows起動から6分程度待ったか。
+3. PCとGalaxy端末が同じSamsung Accountを使用しているか。
+4. 両方でWi-FiとBluetoothがオンになっているか。
+5. Galaxy端末側の「マルチコントロール」がオンか。
+6. PCでSamsung Account、Galaxy Connect、Multi Controlを一度開いたか。
+7. `Samsung Multi Control Service` が実行中か。
+8. `SamsungContinuityWindowsService` が必要時に起動できるか。
+9. 起動タスクのログにサービス再起動の失敗がないか。
+10. Intel Wi-Fiドライバー更新後に問題が発生していないか。
+
+## ログの場所
+
+今回の記録で使用したログは以下です。
+
+```text
+インストールログ:
+C:\GalaxyBook\Logs\GalaxyBookEnabler_20260826_222250.log
+
+Multi Control起動処理ログ:
+C:\GalaxyBook\Logs\Init-SamsungMultiControlOnLogin.log
+```
+
+インストールログには、PC情報、PowerShellバージョン、Wi-Fi／Bluetooth検出結果、パッケージごとの開始と成否、最終結果が記録されます。
+
+Multi Control起動処理ログには、起動後の待機、対象サービスの状態、再起動結果が記録されます。起動後につながらない場合はこちらを先に確認すると効率的です。
+
+## インストール後に作成された主な場所
+
+```text
+C:\Users\aoe1928\.galaxy-book-enabler
+├─ GalaxyBookSpoof.bat
+├─ Init-SamsungMultiControlOnLogin.ps1
+└─ gbe-config.json
+
+C:\GalaxyBook
+├─ SamsungSystemSupportEngine.exe
+├─ SamsungSystemSupportService.exe
+├─ SamsungSystemSupportOSD.exe
+├─ SFourSWComp15.inf
+└─ Logs
+```
+
+ブログへ公開する際は、ユーザー名を含むパスを `%USERPROFILE%` 表記へ置き換えると個人情報を出さずに済みます。
+
+```text
+%USERPROFILE%\.galaxy-book-enabler
+```
+
+## アンインストール方法
+
+元に戻したい場合は、PowerShell 7からインストーラーのアンインストール機能を実行できます。
+
+```powershell
+cd C:\GalaxyBookEnabler-main
+
+& "C:\Program Files\PowerShell\7\pwsh.exe" `
+  -NoProfile `
+  -ExecutionPolicy Bypass `
+  -File ".\Install-GalaxyBookEnabler.ps1" `
+  -Uninstall
+```
+
+インストーラーには、すべて削除、アプリのみ削除、サービスのみ削除などの選択肢があります。「Nuke Mode」はSamsungアプリのキャッシュ、設定、データベースなども削除するため、必要なデータを確認してから使用します。
+
+## 注意点と限界
+
+- SamsungおよびMicrosoftの公式サポート対象外の構成です。
+- Windows UpdateやSamsungアプリのアップデートで動かなくなる可能性があります。
+- Galaxy Book Enablerの更新後は設定の再適用が必要になる場合があります。
+- PC構成が異なれば、同じプロファイルやSSSE戦略で同じ結果になるとは限りません。
+- Quick Shareなど一部機能は、Wi-Fi／ブログへ公開する際は、Bluetoothチップやドライバーの相性に左右されます。
+- セキュリティソフトを一時停止する方法はリスクがあるため、今回の作業では行っていません。
+- 実行ポリシーをシステム全体で `Unrestricted` に変更する方法も採用していません。PowerShell起動時の `-ExecutionPolicy Bypass` を対象プロセスに限定して使用しました。
+
+## まとめ
+
+今回の環境では、PowerShell 7を正式に導入し、Galaxy Book Enabler 3.1.5をGalaxy Book4 Pro／Recommended／SSSE Dual構成で実行することで、非Samsung製のASUS PCでもMulti Controlを利用できるようになりました。
+
+重要だったのは、単にスクリプトを実行するだけでなく、次の点を確認したことです。
+
+- 実行前にREADMEとスクリプトの要件を確認する
+- PowerShell MSIのハッシュを検証する
+- UAC昇格と終了コードを確認する
+- パッケージ、サービス、ドライバー、タスクを個別に検証する
+- インストール後にWindowsを明示的に再起動する
+- 起動後の安定化タスクが終わるまで待つ
+- ログから成功と警告を区別する
+
+特に、インストール直後に動かなくても、既存のGalaxy Connectプロセスが残っている場合があります。今回のケースではWindows再起動が最後の決め手になりました。
+
+---
+
+## 公開前チェックリスト
+
+- [ ] `%USERPROFILE%`へ置換し、Windowsユーザー名を伏せる
+- [ ] ログやスクリーンショットにメールアドレス、Samsung Account名、端末名が映っていないか確認する
+- [ ] 使用したGalaxy端末の機種名とOSバージョンを必要に応じて追記する
+- [ ] Galaxy Book EnablerのリポジトリURLと参照日を追記する
+- [ ] 非公式ツールである旨と自己責任の注意書きを残す
+- [ ] 公開時点でバージョンや配布ファイルが変わっていないか再確認する
