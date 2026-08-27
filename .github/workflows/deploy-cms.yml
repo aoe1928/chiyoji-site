@@ -10,7 +10,9 @@ permissions:
   contents: write
 
 concurrency:
-  group: cms-pages
+  # v2 separates new deployments from runs orphaned during the 2026-08-26
+  # GitHub Actions incident.
+  group: cms-pages-v2
   cancel-in-progress: true
 
 jobs:
