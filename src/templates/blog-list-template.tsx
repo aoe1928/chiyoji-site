@@ -52,7 +52,7 @@ const PaginationContainer = styled(Box)(({ theme }) => ({
   borderTop: '1px solid rgba(255, 255, 255, 0.12)',
 }));
 
-const getPagePath = (page: number) => page === 1 ? '/' : `/page/${page}`;
+const getPagePath = (basePath: string, page: number) => page === 1 ? basePath : `${basePath}/page/${page}`;
 
 const getVisiblePages = (currentPage: number, numPages: number) => {
   if (numPages <= 7) {
@@ -96,6 +96,8 @@ type PageContext = {
   allPosts: PageContext['posts'];
   numPages: number;
   currentPage: number;
+  basePath: string;
+  section: 'music' | 'blog';
 };
 
 type Props = {
@@ -105,7 +107,7 @@ type Props = {
 const BlogListTemplate: React.FC<Props> = ({ pageContext }) => {
   const { language } = useI18next();
   const isEnglish = language === 'en';
-  const { posts, allPosts, currentPage, numPages } = pageContext;
+  const { posts, allPosts, currentPage, numPages, basePath, section } = pageContext;
   const [query, setQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -254,10 +256,28 @@ const BlogListTemplate: React.FC<Props> = ({ pageContext }) => {
                 textAlign: { xs: 'center', sm: 'left' },
               }}
             >
-              Chiyoji's Page
+              {section === 'music'
+                ? (isEnglish ? 'Music Activity' : '音楽活動')
+                : (isEnglish ? 'Blog' : 'ブログ')}
             </Typography>
-            <CharacterImage src="https://pub-01fefff4e3b240f089003a1627fe087d.r2.dev/second_waltz_chara.gif" alt="Second Waltz Character" />
+            {section === 'music' && (
+              <CharacterImage src="https://pub-01fefff4e3b240f089003a1627fe087d.r2.dev/second_waltz_chara.gif" alt="Second Waltz Character" />
+            )}
           </Box>
+          <Typography sx={{ mb: 3, color: 'text.secondary', textAlign: { xs: 'center', sm: 'left' } }}>
+            {section === 'music'
+              ? (isEnglish ? 'Projects, releases, and live updates.' : '音楽プロジェクト、リリース、ライブのお知らせ。')
+              : (isEnglish ? 'Technology, travel, gadgets, and everyday notes.' : '技術、旅行、ガジェットなどの記録。')}
+          </Typography>
+          {section === 'music' && (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
+              <Button component={Link} language={language} to="/second-waltz" variant="outlined">Second Waltz</Button>
+              <Button component={Link} language={language} to="/purgatorio" variant="outlined">Purgatorio</Button>
+              <Button component={Link} language={language} to="/music" variant="outlined">
+                {isEnglish ? 'Songs' : '楽曲紹介'}
+              </Button>
+            </Box>
+          )}
           <Paper variant="outlined" sx={{ display: { xs: 'block', md: 'none' }, mb: 2, backgroundColor: 'rgba(255,255,255,0.025)' }}>
             <Button
               fullWidth
@@ -320,7 +340,7 @@ const BlogListTemplate: React.FC<Props> = ({ pageContext }) => {
           <IconButton
             component={Link}
             language={language}
-            to="/"
+            to={basePath}
             aria-label={isEnglish ? 'First page' : '最初のページ'}
             disabled={isFirst}
             sx={{ color: '#FFB6C1' }}
@@ -331,7 +351,7 @@ const BlogListTemplate: React.FC<Props> = ({ pageContext }) => {
           <Button
             component={Link}
             language={language}
-            to={getPagePath(Math.max(1, currentPage - 1))}
+            to={getPagePath(basePath, Math.max(1, currentPage - 1))}
             disabled={isFirst}
             startIcon={<ArrowBackIosNewIcon />}
             aria-label={isEnglish ? 'Previous page' : '前のページ'}
@@ -375,7 +395,7 @@ const BlogListTemplate: React.FC<Props> = ({ pageContext }) => {
               key={page}
               component={Link}
               language={language}
-              to={getPagePath(page)}
+              to={getPagePath(basePath, page)}
               aria-label={isEnglish ? `Go to page ${page}` : `${page}ページへ`}
               sx={{ width: 40, height: 40, color: '#FFB6C1' }}
             >
@@ -386,7 +406,7 @@ const BlogListTemplate: React.FC<Props> = ({ pageContext }) => {
           <Button
             component={Link}
             language={language}
-            to={getPagePath(Math.min(numPages, currentPage + 1))}
+            to={getPagePath(basePath, Math.min(numPages, currentPage + 1))}
             disabled={isLast}
             endIcon={<ArrowForwardIosIcon />}
             aria-label={isEnglish ? 'Next page' : '次のページ'}
@@ -400,7 +420,7 @@ const BlogListTemplate: React.FC<Props> = ({ pageContext }) => {
           <IconButton
             component={Link}
             language={language}
-            to={getPagePath(numPages)}
+            to={getPagePath(basePath, numPages)}
             aria-label={isEnglish ? 'Last page' : '最後のページ'}
             disabled={isLast}
             sx={{ color: '#FFB6C1' }}

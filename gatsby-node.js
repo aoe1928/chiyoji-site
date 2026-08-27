@@ -150,23 +150,33 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
   });
 
   const postsPerPage = 5;
-  const numPages = Math.ceil(posts.length / postsPerPage);
+  const musicPosts = posts.filter(({ node }) => node.frontmatter.categories?.[0] === 'music');
+  const generalPosts = posts.filter(({ node }) => node.frontmatter.categories?.[0] !== 'music');
 
-  Array.from({ length: numPages }).forEach((_, index) => {
-    actions.createPage({
-      path: index === 0 ? '/' : `/page/${index + 1}`,
-      component: blogListTemplate,
-      context: {
-        limit: postsPerPage,
-        skip: index * postsPerPage,
-        numPages,
-        currentPage: index + 1,
-        posts: posts.slice(index * postsPerPage, (index + 1) * postsPerPage).map(withTranslation),
-        allPosts: posts.map(withTranslation),
-        months,
-      },
+  const createSectionPages = ({ sectionPosts, basePath, section }) => {
+    const numPages = Math.max(1, Math.ceil(sectionPosts.length / postsPerPage));
+
+    Array.from({ length: numPages }).forEach((_, index) => {
+      actions.createPage({
+        path: index === 0 ? basePath : `${basePath}/page/${index + 1}`,
+        component: blogListTemplate,
+        context: {
+          limit: postsPerPage,
+          skip: index * postsPerPage,
+          numPages,
+          currentPage: index + 1,
+          basePath,
+          section,
+          posts: sectionPosts.slice(index * postsPerPage, (index + 1) * postsPerPage).map(withTranslation),
+          allPosts: sectionPosts.map(withTranslation),
+          months,
+        },
+      });
     });
-  });
+  };
+
+  createSectionPages({ sectionPosts: musicPosts, basePath: '/music-activity', section: 'music' });
+  createSectionPages({ sectionPosts: generalPosts, basePath: '/blog', section: 'blog' });
 
   const postsByCategoryPath = new Map();
   posts.forEach(post => {

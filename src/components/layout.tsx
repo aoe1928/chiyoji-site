@@ -97,21 +97,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 open={Boolean(anchorEl)}
                 onClose={handleMenuClose}
               >
-                <MenuItem sx={{ color: '#FFB6C1' }} onClick={handleMenuClose} component={Link} language={language} to="/">{isEnglish ? 'Home' : 'トップページ'}</MenuItem>
+                <MenuItem sx={{ color: '#FFB6C1' }} onClick={handleMenuClose} component={Link} language={language} to="/music-activity">{isEnglish ? 'Music Activity' : '音楽活動'}</MenuItem>
+                <MenuItem sx={{ color: '#FFB6C1' }} onClick={handleMenuClose} component={Link} language={language} to="/blog">{isEnglish ? 'Blog' : 'ブログ'}</MenuItem>
                 <MenuItem sx={{ color: '#FFB6C1' }} onClick={handleMenuClose} component={Link} language={language} to="/links">{isEnglish ? 'Links' : 'リンク'}</MenuItem>
-                <MenuItem sx={{ color: '#FFB6C1' }} onClick={handleMenuClose} component={Link} language={language} to="/second-waltz">Second Waltz</MenuItem>
-                <MenuItem sx={{ color: '#FFB6C1' }} onClick={handleMenuClose} component={Link} language={language} to="/purgatorio">Purgatorio</MenuItem>
-                <MenuItem sx={{ color: '#FFB6C1' }} onClick={handleMenuClose} component={Link} language={language} to="/music">{isEnglish ? 'Music' : '楽曲紹介'}</MenuItem>
                 <MenuItem sx={{ color: '#FFB6C1' }} onClick={handleMenuClose} component={Link} language={language} to="/about">{isEnglish ? 'About' : '自己紹介'}</MenuItem>
               </Menu>
             </>
           ) : (
             <>
-              <StyledLink language={language} to="/">{isEnglish ? 'Home' : 'トップページ'}</StyledLink>
+              <StyledLink language={language} to="/music-activity">{isEnglish ? 'Music Activity' : '音楽活動'}</StyledLink>
+              <StyledLink language={language} to="/blog">{isEnglish ? 'Blog' : 'ブログ'}</StyledLink>
               <StyledLink language={language} to="/links">{isEnglish ? 'Links' : 'リンク'}</StyledLink>
-              <StyledLink language={language} to="/second-waltz">Second Waltz</StyledLink>
-              <StyledLink language={language} to="/purgatorio">Purgatorio</StyledLink>
-              <StyledLink language={language} to="/music">{isEnglish ? 'Music' : '楽曲紹介'}</StyledLink>
               <StyledLink language={language} to="/about">{isEnglish ? 'About' : '自己紹介'}</StyledLink>
             </>
           )}
