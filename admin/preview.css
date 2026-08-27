@@ -1,0 +1,10 @@
+/* Keep CMS editor images close to their size on the published article page. */
+body img {
+  display: block;
+  width: auto !important;
+  max-width: min(520px, calc(100% - 32px)) !important;
+  max-height: 72vh !important;
+  height: auto !important;
+  margin: 24px auto !important;
+  object-fit: contain;
+}
