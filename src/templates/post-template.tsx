@@ -49,6 +49,12 @@ const useStyles = makeStyles({
   },
 });
 
+const normalizeArticleImageSrc = (src: string) => {
+  const normalized = src.replace(/\\/g, '/');
+  const match = normalized.match(/^(?:\/)?static\/images\/blog\/(.+)$/i);
+  return match ? `/images/blog/${match[1]}` : normalized;
+};
+
 const PostTemplate: React.FC<Props> = ({ data, pageContext }) => {
     const { language } = useI18next();
     const localizedPost = data.allMdx.nodes.find(({ frontmatter }) =>
@@ -71,7 +77,9 @@ const PostTemplate: React.FC<Props> = ({ data, pageContext }) => {
       title?: string;
     };
 
-    const ArticleImage: React.FC<FullWidthImageProps> = ({ src, alt, title }) => (
+    const ArticleImage: React.FC<FullWidthImageProps> = ({ src, alt, title }) => {
+      const imageSrc = normalizeArticleImageSrc(src);
+      return (
       <Box
         component="span"
         sx={{
@@ -85,7 +93,7 @@ const PostTemplate: React.FC<Props> = ({ data, pageContext }) => {
       >
         <Box
           component="a"
-          href={src}
+          href={imageSrc}
           target="_blank"
           rel="noopener noreferrer"
           aria-label={alt ? `${alt}（原寸画像を開く）` : '原寸画像を開く'}
@@ -110,7 +118,7 @@ const PostTemplate: React.FC<Props> = ({ data, pageContext }) => {
         >
           <Box
             component="img"
-            src={src}
+            src={imageSrc}
             alt={alt || title || ''}
             title={title}
             loading="lazy"
@@ -136,7 +144,8 @@ const PostTemplate: React.FC<Props> = ({ data, pageContext }) => {
           </Typography>
         )}
       </Box>
-    );
+      );
+    };
 
     const FullWidthImage: React.FC<FullWidthImageProps> = ({ src, alt, title }) => (
       <ArticleImage src={src} alt={alt} title={title} />

@@ -217,6 +217,12 @@
     return /メディア|media/i.test(text) && /アップロード|upload/i.test(text) ? dialog : null;
   }
 
+  function currentMediaDialog() {
+    return Array.from(document.querySelectorAll('[role="dialog"], [aria-modal="true"]')).find(
+      (dialog) => mediaDialogFor(dialog) === dialog,
+    ) || null;
+  }
+
   function mediaUploadInput(dialog) {
     const dialogInput = dialog.querySelector('input[type="file"]');
     if (dialogInput instanceof HTMLInputElement) return dialogInput;
@@ -340,6 +346,7 @@
       throw new Error("URLの入力先を見つけられませんでした。画像欄の「他の画像を選択」から開き直してください。");
     }
 
+    const selectedName = lastSelectedMediaName || selectedMediaNameFromStyles(dialog);
     lastCopiedMediaPath = "";
     const buttons = Array.from(dialog.querySelectorAll("button"));
     const copyButton = buttons.find((button) => /パスをコピー|名前をコピー|copy(path|name|url)/i.test(compactText(button)));
@@ -355,7 +362,7 @@
         // Clipboard reading may be blocked; use the selected card's filename.
       }
     }
-    path = normalizeMediaUrl(path, lastSelectedMediaName || selectedMediaNameFromStyles(dialog));
+    path = normalizeMediaUrl(path, selectedName);
     if (!path) throw new Error("選択した画像のパスを取得できませんでした。「パスをコピー」を一度押してから選択してください。");
 
     const closeButton = buttons.find((button) => /閉じる|close/i.test(button.getAttribute("aria-label") || ""));
@@ -372,6 +379,8 @@
     } finally {
       window.prompt = nativePrompt;
     }
+    activeImageWidgetRoot = null;
+    lastSelectedMediaName = "";
     showStatus(`URLとして挿入しました：${path}`, "done", 7000);
   }
 
@@ -384,7 +393,11 @@
 
       if (!dialog && button) {
         const root = imageWidgetRootFor(button);
-        if (root) activeImageWidgetRoot = root;
+        if (root) {
+          activeImageWidgetRoot = root;
+          lastSelectedMediaName = "";
+          lastCopiedMediaPath = "";
+        }
         return;
       }
 
@@ -435,12 +448,19 @@
       if (!files.some((file) => isCompressible(file) || isHeic(file))) return;
       event.preventDefault();
       event.stopImmediatePropagation();
+      const editorMediaUpload = Boolean(activeImageWidgetRoot && (mediaDialogFor(input) || currentMediaDialog()));
 
       prepareFiles(files)
         .then((results) => {
+          if (editorMediaUpload && results.length === 1) {
+            lastSelectedMediaName = results[0].file.name;
+          }
           input.files = filesDataTransfer(results).files;
           replayingInputs.add(input);
           input.dispatchEvent(new Event("change", { bubbles: true }));
+          if (editorMediaUpload) {
+            showStatus("アップロード後、写真を選んで「選択する」を押してください。", "done", 9000);
+          }
         })
         .catch((error) => {
           input.value = "";
