@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import { Helmet } from 'react-helmet';
 import Layout from './layout';
 
-const DRAFT_PREVIEW_HASH = 'ba885bec043c19ce65838fc86255834e86a31157dd207136d42830b4f60ebafa';
+const DRAFT_PREVIEW_HASH = 'de0366a7e7978b430a3bda24884f6a18600ea9afb1a29387b49d476baf419bde';
 const DRAFT_PREVIEW_SESSION_KEY = 'chiyoji-draft-preview-unlocked';
 
 const sha256 = async (value: string) => {
