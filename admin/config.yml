@@ -88,7 +88,7 @@ collections:
       - label: 本文
         name: body
         widget: markdown
-        hint: JPEG・PNG・WebPは追加時に長辺2560px、約1.5MB以下の公開用WebPへ自動圧縮します。原本は端末側に残ります。GIF・SVGは圧縮せず1枚2MBまで、HEICは事前にJPEGへ変換してください。
+        hint: 本文へドラッグ＆ドロップ、または画像ボタンで追加できます。JPEG・PNGは長辺2560px、約1.5MB以下の公開用WebPへ自動変換します。原本は端末側に残ります。GIF・SVGは変換せず1枚2MBまで、HEICは事前にJPEGへ変換してください。
         media_library:
           config:
             # Keep originals elsewhere; this repository receives web-ready copies.
