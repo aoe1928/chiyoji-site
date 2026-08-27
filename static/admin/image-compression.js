@@ -12,6 +12,23 @@
   });
 
   const replayingInputs = new WeakSet();
+  let activeImageWidgetRoot = null;
+  let lastSelectedMediaName = "";
+  let lastCopiedMediaPath = "";
+
+  const nativeClipboardWrite = navigator.clipboard?.writeText?.bind(navigator.clipboard);
+  if (nativeClipboardWrite) {
+    try {
+      navigator.clipboard.writeText = async (value) => {
+        if (typeof value === "string" && /\.(jpe?g|png|webp|gif|svg)$/i.test(value)) {
+          lastCopiedMediaPath = value;
+        }
+        return nativeClipboardWrite(value);
+      };
+    } catch {
+      // Some browsers expose clipboard methods as read-only. The filename fallback below still works.
+    }
+  }
 
   function formatMegabytes(bytes) {
     return `${(bytes / 1000000).toFixed(1)}MB`;
@@ -246,6 +263,128 @@
     const overlay = document.getElementById("chiyoji-media-drop-overlay");
     if (overlay) overlay.hidden = true;
   }
+
+  function compactText(element) {
+    return (element?.textContent || "").replace(/\s+/g, "").trim();
+  }
+
+  function isUrlButton(button) {
+    return /URLを(入力|変更)|enterurl|replaceurl/i.test(compactText(button));
+  }
+
+  function imageWidgetRootFor(button) {
+    let element = button?.parentElement;
+    for (let depth = 0; element && depth < 9; depth += 1, element = element.parentElement) {
+      if (!element.closest('[role="dialog"], [aria-modal="true"]')) {
+        const urlButton = Array.from(element.querySelectorAll("button")).find(isUrlButton);
+        if (urlButton) return element;
+      }
+    }
+    return null;
+  }
+
+  function mediaNameFromClick(target, dialog) {
+    let element = target instanceof Element ? target : null;
+    while (element && element !== dialog) {
+      const label = Array.from(element.children || []).find(
+        (child) => child.tagName === "P" && /\.(jpe?g|png|webp|gif|svg)$/i.test(compactText(child)),
+      );
+      if (label) return compactText(label);
+      element = element.parentElement;
+    }
+    return "";
+  }
+
+  function mediaFallbackPath(name) {
+    return name ? `/images/blog/${name}` : "";
+  }
+
+  function selectedMediaNameFromStyles(dialog) {
+    const cards = Array.from(dialog.querySelectorAll("p"))
+      .filter((label) => /\.(jpe?g|png|webp|gif|svg)$/i.test(compactText(label)))
+      .map((label) => ({ name: compactText(label), card: label.parentElement }))
+      .filter(({ card }) => card);
+    if (cards.length === 1) return cards[0].name;
+    const colorCounts = new Map();
+    for (const { card } of cards) {
+      const color = getComputedStyle(card).borderColor;
+      colorCounts.set(color, (colorCounts.get(color) || 0) + 1);
+    }
+    const majority = Math.max(0, ...colorCounts.values());
+    return cards.find(({ card }) => colorCounts.get(getComputedStyle(card).borderColor) < majority)?.name || "";
+  }
+
+  function wait(milliseconds) {
+    return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+  }
+
+  async function insertSelectedMediaAsUrl(dialog) {
+    if (!activeImageWidgetRoot) {
+      throw new Error("URLの入力先を見つけられませんでした。画像欄の「他の画像を選択」から開き直してください。");
+    }
+
+    lastCopiedMediaPath = "";
+    const buttons = Array.from(dialog.querySelectorAll("button"));
+    const copyButton = buttons.find((button) => /パスをコピー|名前をコピー|copy(path|name|url)/i.test(compactText(button)));
+    if (copyButton && !copyButton.disabled) copyButton.click();
+    await wait(80);
+
+    let path = lastCopiedMediaPath;
+    if (!path && navigator.clipboard?.readText) {
+      try {
+        const copied = await navigator.clipboard.readText();
+        if (/\.(jpe?g|png|webp|gif|svg)$/i.test(copied)) path = copied;
+      } catch {
+        // Clipboard reading may be blocked; use the selected card's filename.
+      }
+    }
+    path ||= mediaFallbackPath(lastSelectedMediaName || selectedMediaNameFromStyles(dialog));
+    if (!path) throw new Error("選択した画像のパスを取得できませんでした。「パスをコピー」を一度押してから選択してください。");
+
+    const closeButton = buttons.find((button) => /閉じる|close/i.test(button.getAttribute("aria-label") || ""));
+    if (!closeButton) throw new Error("画像一覧を閉じられませんでした。");
+    closeButton.click();
+    await wait(380);
+
+    const urlButton = Array.from(activeImageWidgetRoot.querySelectorAll("button")).find(isUrlButton);
+    if (!urlButton) throw new Error("画像のURL入力ボタンを見つけられませんでした。");
+    const nativePrompt = window.prompt;
+    window.prompt = () => path;
+    try {
+      urlButton.click();
+    } finally {
+      window.prompt = nativePrompt;
+    }
+    showStatus(`URLとして挿入しました：${path}`, "done", 7000);
+  }
+
+  document.addEventListener(
+    "click",
+    (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      const button = target?.closest("button");
+      const dialog = mediaDialogFor(target);
+
+      if (!dialog && button) {
+        const root = imageWidgetRootFor(button);
+        if (root) activeImageWidgetRoot = root;
+        return;
+      }
+
+      if (!dialog) return;
+      const mediaName = mediaNameFromClick(target, dialog);
+      if (mediaName) lastSelectedMediaName = mediaName;
+
+      if (button && /^選択する$|^choose(selected)?$/i.test(compactText(button))) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        insertSelectedMediaAsUrl(dialog).catch((error) => {
+          showStatus(error.message || "画像URLの入力に失敗しました。", "error", 10000);
+        });
+      }
+    },
+    true,
+  );
 
   function successMessage(results) {
     const changed = results.filter((result) => result.changed);
