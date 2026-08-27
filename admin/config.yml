@@ -88,7 +88,7 @@ collections:
       - label: 本文
         name: body
         widget: markdown
-        hint: 安定性のため画像は1枚ずつ追加してください。複数画像をまとめて扱う場合は /write/ のローカル編集画面を利用できます。JPEG・PNGは長辺2560px、約1.5MB以下の公開用WebPへ自動変換します。
+        hint: 画像はメディア画面へドラッグ＆ドロップできます。「選択する」を押すと、画像パスをURLとして本文へ入力します。JPEG・PNGは長辺2560px、約1.5MB以下の公開用WebPへ自動変換します。
         media_library:
           config:
             # Keep originals elsewhere; this repository receives web-ready copies.
