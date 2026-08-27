@@ -9,6 +9,18 @@ module.exports = {
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
     {
+      resolve: `gatsby-plugin-manifest`,
+      options: {
+        name: `ちよじのホームページ`,
+        short_name: `ちよじ`,
+        start_url: `/`,
+        background_color: `#101010`,
+        theme_color: `#66ff66`,
+        display: `minimal-ui`,
+        icon: `static/favicon.png`,
+      },
+    },
+    {
       resolve: `gatsby-plugin-mdx`,
       options: {
         extensions: [`.mdx`, `.md`],

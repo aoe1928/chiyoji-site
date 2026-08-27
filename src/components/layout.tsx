@@ -55,6 +55,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <>
       <Helmet>
+        <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="apple-touch-icon" href="/favicon.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
         <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Dancing+Script&family=Lora&family=Lobster&display=swap" rel="stylesheet" />
