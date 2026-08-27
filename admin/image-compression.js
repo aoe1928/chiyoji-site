@@ -192,6 +192,61 @@
     return transfer;
   }
 
+  function mediaDialogFor(target) {
+    if (!(target instanceof Element)) return null;
+    const dialog = target.closest('[role="dialog"], [aria-modal="true"]');
+    if (!dialog) return null;
+    const text = dialog.textContent || "";
+    return /メディア|media/i.test(text) && /アップロード|upload/i.test(text) ? dialog : null;
+  }
+
+  function mediaUploadInput(dialog) {
+    const dialogInput = dialog.querySelector('input[type="file"]');
+    if (dialogInput instanceof HTMLInputElement) return dialogInput;
+    return Array.from(document.querySelectorAll('input[type="file"]')).find(
+      (input) => input instanceof HTMLInputElement && /image|jpe?g|png|webp/i.test(input.accept || "image"),
+    ) || null;
+  }
+
+  function showMediaDropOverlay(dialog) {
+    let overlay = document.getElementById("chiyoji-media-drop-overlay");
+    if (!overlay) {
+      overlay = document.createElement("div");
+      overlay.id = "chiyoji-media-drop-overlay";
+      overlay.innerHTML = "<strong>写真をここへドロップ</strong><span>WebPへ変換してメディアへ追加します</span>";
+      Object.assign(overlay.style, {
+        position: "fixed",
+        zIndex: "2147483646",
+        display: "grid",
+        placeContent: "center",
+        gap: "8px",
+        border: "3px dashed #16746a",
+        borderRadius: "12px",
+        color: "#0d574f",
+        background: "rgba(223, 244, 239, 0.94)",
+        textAlign: "center",
+        font: "600 15px/1.5 system-ui, sans-serif",
+        pointerEvents: "none",
+        boxShadow: "inset 0 0 0 5px rgba(255, 255, 255, 0.7)",
+      });
+      overlay.querySelector("strong").style.fontSize = "20px";
+      document.body.appendChild(overlay);
+    }
+    const rect = dialog.getBoundingClientRect();
+    Object.assign(overlay.style, {
+      left: `${rect.left + 14}px`,
+      top: `${rect.top + 14}px`,
+      width: `${Math.max(0, rect.width - 28)}px`,
+      height: `${Math.max(0, rect.height - 28)}px`,
+    });
+    overlay.hidden = false;
+  }
+
+  function hideMediaDropOverlay() {
+    const overlay = document.getElementById("chiyoji-media-drop-overlay");
+    if (overlay) overlay.hidden = true;
+  }
+
   function successMessage(results) {
     const changed = results.filter((result) => result.changed);
     if (!changed.length) return "画像はすでに公開向けサイズです。";
@@ -240,6 +295,29 @@
   );
 
   document.addEventListener(
+    "dragover",
+    (event) => {
+      if (!event.dataTransfer?.types?.includes("Files")) return;
+      const dialog = mediaDialogFor(event.target);
+      if (!dialog) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "copy";
+      showMediaDropOverlay(dialog);
+    },
+    true,
+  );
+
+  document.addEventListener(
+    "dragleave",
+    (event) => {
+      const dialog = mediaDialogFor(event.target);
+      if (!dialog || (event.relatedTarget instanceof Node && dialog.contains(event.relatedTarget))) return;
+      window.setTimeout(hideMediaDropOverlay, 80);
+    },
+    true,
+  );
+
+  document.addEventListener(
     "drop",
     (event) => {
       if (event.chiyojiCompressedDrop || !event.dataTransfer?.files?.length) return;
@@ -248,9 +326,21 @@
       event.preventDefault();
       event.stopImmediatePropagation();
       const target = event.target;
+      const mediaDialog = mediaDialogFor(target);
+      hideMediaDropOverlay();
 
       prepareFiles(files)
         .then((results) => {
+          if (mediaDialog) {
+            const input = mediaUploadInput(mediaDialog);
+            if (!input) throw new Error("アップロード欄を見つけられませんでした。画面上部の「アップロードする」を一度押してください。");
+            input.multiple = true;
+            input.files = filesDataTransfer(results).files;
+            replayingInputs.add(input);
+            input.dispatchEvent(new Event("change", { bubbles: true }));
+            showStatus(`${results.length}枚のメディア追加を開始しました。`, "done", 7000);
+            return;
+          }
           const replay = new DragEvent("drop", {
             bubbles: true,
             cancelable: true,
