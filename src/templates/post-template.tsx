@@ -15,6 +15,8 @@ import InstagramIcon from '@mui/icons-material/Instagram';
 import MailIcon from '@mui/icons-material/Mail';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import LinkIcon from '@mui/icons-material/Link';
+import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import { makeStyles } from '@mui/styles';
 import CategoryTrail from '../components/category-trail';
 import DraftPreviewGate from '../components/draft-preview-gate';
@@ -50,10 +52,186 @@ const useStyles = makeStyles({
 });
 
 const normalizeArticleImageSrc = (src: string) => {
+  if (!src) return '';
+  if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('data:')) {
+    return src;
+  }
   const normalized = src.replace(/\\/g, '/');
   const match = normalized.match(/^(?:\/)?static\/images\/blog\/(.+)$/i);
-  return match ? `/images/blog/${match[1]}` : normalized;
+  if (match) return `/images/blog/${match[1]}`;
+  if (normalized.startsWith('/images/blog/')) return normalized;
+  if (normalized.startsWith('images/blog/')) return `/${normalized}`;
+  if (!normalized.startsWith('/')) {
+    return `/images/blog/${normalized}`;
+  }
+  return normalized;
 };
+
+type CodeBlockProps = {
+  children?: React.ReactNode;
+};
+
+const CODE_LANGUAGE_LABELS: Record<string, string> = {
+  text: 'TEXT',
+  txt: 'TEXT',
+  powershell: 'POWERSHELL',
+  ps1: 'POWERSHELL',
+  bash: 'BASH',
+  shell: 'SHELL',
+  json: 'JSON',
+};
+
+const CodeBlock: React.FC<CodeBlockProps> = ({ children }) => {
+  const [copied, setCopied] = React.useState(false);
+  const codeElement = React.isValidElement<{ className?: string; children?: React.ReactNode }>(children)
+    ? children
+    : null;
+  const className = String(codeElement?.props?.className || '');
+  const language = className.match(/language-([\w-]+)/)?.[1]?.toLowerCase() || 'text';
+  const label = CODE_LANGUAGE_LABELS[language] || language.toUpperCase();
+  const code = String(codeElement?.props?.children ?? children ?? '').replace(/\n$/, '');
+
+  const copyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      const textarea = document.createElement('textarea');
+      textarea.value = code;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      textarea.remove();
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    }
+  };
+
+  return (
+    <Box
+      component="figure"
+      sx={{
+        maxWidth: '920px',
+        mx: 'auto',
+        my: { xs: 3, sm: 4 },
+        overflow: 'hidden',
+        border: '1px solid rgba(181, 255, 189, 0.22)',
+        borderRadius: { xs: '12px', sm: '16px' },
+        backgroundColor: '#090d0a',
+        boxShadow: '0 16px 38px rgba(0, 0, 0, 0.28)',
+      }}
+    >
+      <Box
+        component="figcaption"
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          minHeight: '44px',
+          px: { xs: 1.5, sm: 2 },
+          borderBottom: '1px solid rgba(181, 255, 189, 0.14)',
+          backgroundColor: 'rgba(181, 255, 189, 0.055)',
+        }}
+      >
+        <Typography
+          component="span"
+          sx={{
+            color: '#b5ffbd',
+            fontFamily: 'monospace',
+            fontSize: '0.72rem',
+            fontWeight: 800,
+            letterSpacing: '0.12em',
+          }}
+        >
+          {label}
+        </Typography>
+        <Box
+          component="button"
+          type="button"
+          onClick={copyCode}
+          aria-label={copied ? 'コピーしました' : 'コードをコピー'}
+          sx={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 0.65,
+            minHeight: '32px',
+            px: 1.25,
+            border: '1px solid rgba(255, 255, 255, 0.16)',
+            borderRadius: '8px',
+            color: copied ? '#b5ffbd' : '#f7fff7',
+            backgroundColor: copied ? 'rgba(102, 255, 102, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+            cursor: 'pointer',
+            font: 'inherit',
+            fontSize: '0.78rem',
+            fontWeight: 700,
+            transition: 'border-color 160ms ease, background-color 160ms ease',
+            '&:hover': {
+              borderColor: 'rgba(181, 255, 189, 0.5)',
+              backgroundColor: 'rgba(181, 255, 189, 0.1)',
+            },
+            '&:focus-visible': {
+              outline: '2px solid #ffb6c1',
+              outlineOffset: '2px',
+            },
+          }}
+        >
+          {copied ? <CheckRoundedIcon sx={{ fontSize: 17 }} /> : <ContentCopyRoundedIcon sx={{ fontSize: 16 }} />}
+          {copied ? 'コピーしました' : 'コピー'}
+        </Box>
+      </Box>
+      <Box
+        component="pre"
+        tabIndex={0}
+        sx={{
+          m: 0,
+          p: { xs: 2, sm: 2.5 },
+          overflowX: 'auto',
+          color: '#f2f7f2',
+          fontFamily: '"Cascadia Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace',
+          fontSize: { xs: '0.8rem', sm: '0.9rem' },
+          fontWeight: 500,
+          lineHeight: 1.75,
+          tabSize: 2,
+          whiteSpace: 'pre',
+          scrollbarColor: 'rgba(181, 255, 189, 0.5) transparent',
+          '&:focus-visible': {
+            outline: '2px solid #ffb6c1',
+            outlineOffset: '-3px',
+          },
+          '& code': {
+            color: 'inherit',
+            font: 'inherit',
+          },
+        }}
+      >
+        <code className={className}>{code}</code>
+      </Box>
+    </Box>
+  );
+};
+
+const InlineCode = ({ children }) => (
+  <Box
+    component="code"
+    sx={{
+      display: 'inline',
+      px: 0.65,
+      py: 0.2,
+      border: '1px solid rgba(181, 255, 189, 0.18)',
+      borderRadius: '5px',
+      color: '#b5ffbd',
+      backgroundColor: 'rgba(181, 255, 189, 0.075)',
+      fontFamily: '"Cascadia Code", Consolas, monospace',
+      fontSize: '0.88em',
+      overflowWrap: 'anywhere',
+    }}
+  >
+    {children}
+  </Box>
+);
 
 const PostTemplate: React.FC<Props> = ({ data, pageContext }) => {
     const { language } = useI18next();
@@ -265,7 +443,14 @@ const PostTemplate: React.FC<Props> = ({ data, pageContext }) => {
       <MDXProvider components={MDXComponents}>
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
-          components={{ a: LinkRenderer, img: ArticleImage, h1: ArticleH1, h2: ArticleH2 }}
+          components={{
+            a: LinkRenderer,
+            img: ArticleImage,
+            h1: ArticleH1,
+            h2: ArticleH2,
+            pre: CodeBlock,
+            code: InlineCode,
+          }}
         >
           {body}
         </ReactMarkdown>

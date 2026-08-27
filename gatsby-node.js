@@ -1,6 +1,26 @@
 const path = require('path');
+const fs = require('fs');
 const { createFilePath } = require('gatsby-source-filesystem');
-const _ = require('lodash');
+
+const SITE_BUILD_ID = new Date().toISOString();
+
+exports.onCreateWebpackConfig = ({ actions, plugins }) => {
+  actions.setWebpackConfig({
+    plugins: [
+      plugins.define({
+        'process.env.GATSBY_SITE_BUILD_ID': JSON.stringify(SITE_BUILD_ID),
+      }),
+    ],
+  });
+};
+
+exports.onPostBuild = () => {
+  fs.writeFileSync(
+    path.join(__dirname, 'public', 'site-version.json'),
+    JSON.stringify({ buildId: SITE_BUILD_ID }),
+    'utf8'
+  );
+};
 
 exports.onCreateDevServer = ({ app }) => {
   const adminIndex = path.resolve(__dirname, 'static/admin/index.html');
@@ -129,9 +149,12 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
     },
   });
 
-  const postsByMonth = _.groupBy(posts, ({ node }) =>
-    node.frontmatter.date.slice(0, 7)
-  );
+  const postsByMonth = posts.reduce((groups, post) => {
+    const month = post.node.frontmatter.date.slice(0, 7);
+    groups[month] = groups[month] || [];
+    groups[month].push(post);
+    return groups;
+  }, {});
   const months = Object.keys(postsByMonth).map(month => ({
     month,
     postCount: postsByMonth[month].length,

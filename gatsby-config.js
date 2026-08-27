@@ -32,7 +32,6 @@ module.exports = {
         ],
       },
     },
-    `gatsby-plugin-typescript`,
     {
       resolve: `gatsby-source-filesystem`,
       options: {
