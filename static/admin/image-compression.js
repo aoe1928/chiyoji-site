@@ -64,6 +64,10 @@
     );
   }
 
+  function isWebp(file) {
+    return file.type.toLowerCase() === "image/webp" || /\.webp$/i.test(file.name);
+  }
+
   function webpName(originalName) {
     const stem = originalName.replace(/\.[^.]+$/, "") || "image";
     return `${stem}.webp`;
@@ -143,7 +147,7 @@
     try {
       const source = imageSize(image);
       const requiresResize = Math.max(source.width, source.height) > SETTINGS.maxLongEdge;
-      if (!requiresResize && file.size <= SETTINGS.targetBytes) {
+      if (isWebp(file) && !requiresResize && file.size <= SETTINGS.targetBytes) {
         return { file, changed: false, source, output: source };
       }
 
@@ -162,7 +166,7 @@
         throw new Error(`${file.name} を2MB以下にできませんでした。先に端末側で小さくしてください。`);
       }
 
-      if (blob.size >= file.size && file.size <= SETTINGS.hardLimitBytes) {
+      if (isWebp(file) && blob.size >= file.size && file.size <= SETTINGS.hardLimitBytes) {
         return { file, changed: false, source, output: source };
       }
 
