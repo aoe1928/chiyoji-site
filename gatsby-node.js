@@ -46,13 +46,26 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
     return;
   }
 
+  const sourceFile = getNode(node.parent);
+  const fileSlug = createFilePath({ node, getNode });
+  const configuredSlug = node.frontmatter.slug?.trim();
+  const isCmsPost = sourceFile?.relativePath
+    ? /^20\d{6}-/.test(path.basename(sourceFile.relativePath))
+    : false;
+  const slug = configuredSlug
+    ? configuredSlug.startsWith('/')
+      ? configuredSlug
+      : `/blog/${configuredSlug}/`
+    : isCmsPost
+      ? `/blog/${fileSlug.replace(/^\/+|\/+$/g, '')}/`
+      : fileSlug;
+
   actions.createNodeField({
     name: 'slug',
     node,
-    value: node.frontmatter.slug || createFilePath({ node, getNode }),
+    value: slug,
   });
 
-  const sourceFile = getNode(node.parent);
   if (sourceFile && sourceFile.relativePath) {
     actions.createNodeField({
       name: 'previewSlug',
