@@ -1,21 +1,26 @@
 ---
-title: "非Samsung製Windows PCにGalaxy Book Enablerを導入してMulti Controlを使えるようにした記録"
-date: "2026-08-27"
+title: 非Samsung製Windows PCにGalaxy Book Enablerを導入してMulti Controlを使えるようにした記録
+date: 2026-08-27
 draft: true
-slug: "galaxy-book-enabler-multi-control"
+slug: galaxy-book-enabler-multi-control
 categories:
   - technology
   - gadgets
 ---
-
 ## はじめに
 
 Samsungの「Multi Control」は、PCのキーボードとマウスを使ってGalaxyスマートフォンやタブレットを操作できる機能です。本来は対応するGalaxy Book向けの機能ですが、今回は非Samsung製のWindows PCにオープンソースの「Galaxy Book Enabler」を導入し、Multi Controlが実際に動作するところまで確認しました。
 
 この記事は一般論だけで書いた手順ではなく、2026年8月26日に実機で行った作業、確認できたバージョン、発生したエラー、最終的な検証結果をもとにまとめた記録です。
 
-> [!warning] 重要
+> \[!warning] 重要
 > Galaxy Book EnablerはSamsungやMicrosoftの公式ツールではありません。非Samsung PCをGalaxy Bookとして認識させ、Samsung向けサービスやドライバーを動作させる非公式ツールです。レジストリ、サービス、ドライバー、タスクスケジューラ、Microsoft Storeアプリに変更が入ります。実行する場合は、内容を確認したうえで自己責任で行ってください。
+
+
+
+![](20260828_000842.gif "このように、WindowsとGalaxyFoldをまたいでマウスの操作を行ったりできます。iPad風。")
+
+
 
 ## 今回の結果
 
@@ -23,36 +28,36 @@ Samsungの「Multi Control」は、PCのキーボードとマウスを使ってG
 
 確認できた内容は次のとおりです。
 
-- Galaxy Book Enabler 3.1.5のインストール成功
-- PowerShell 7.6.5の導入成功
-- Multi Control 2.7.1300.0のAppX登録を確認
-- Samsung Account、Samsung Continuity Service、Samsung Settings Runtimeを確認
-- Galaxy Book Enablerのサービスが自動起動状態で稼働
-- Multi Control関連サービスが自動起動状態で稼働
-- 起動時タスク2件の登録を確認
-- Intel Wi-Fi 6 AX200とIntel Bluetoothの検出を確認
-- 最終的にGalaxy端末とのMulti Control接続・操作に成功
+* Galaxy Book Enabler 3.1.5のインストール成功
+* PowerShell 7.6.5の導入成功
+* Multi Control 2.7.1300.0のAppX登録を確認
+* Samsung Account、Samsung Continuity Service、Samsung Settings Runtimeを確認
+* Galaxy Book Enablerのサービスが自動起動状態で稼働
+* Multi Control関連サービスが自動起動状態で稼働
+* 起動時タスク2件の登録を確認
+* Intel Wi-Fi 6 AX200とIntel Bluetoothの検出を確認
+* 最終的にGalaxy端末とのMulti Control接続・操作に成功
 
 ## 検証環境
 
 今回使用したPCは次の構成です（自作PC）。
 
-| 項目 | 内容 |
-|---|---|
-| PCタイプ | 自作PC |
-| マザーボード | ASUS ROG Crosshair VIII Dark Hero（表示: System Product Name） |
-| CPU | AMD Ryzen 9 5950X 16-Core Processor |
-| CPUクーラー | Arctic Liquid Freezer III Pro 280 A-RGB |
-| GPU | MSI GeForce RTX 5060 Ti 16G VENTUS 2X OC PLUS |
-| メモリ | Patriot Viper Steel DDR4 3600MHz 64GB (32GB×2) |
-| ストレージ | WD_BLACK SN850X 2TB |
-| PCケース | Fractal Design Pop Air RGB Black TG |
-| 電源 | 850W VITA GM |
-| OS | Windows 11 Pro（Build 26200） |
-| Wi-Fi | Intel Wi-Fi 6 AX200 160MHz |
-| Bluetooth | Intel Wireless Bluetooth |
-| Galaxy Book Enabler | 3.1.5 |
-| PowerShell | 7.6.5 x64 |
+| 項目                  | 内容                                                         |
+| ------------------- | ---------------------------------------------------------- |
+| PCタイプ               | 自作PC                                                       |
+| マザーボード              | ASUS ROG Crosshair VIII Dark Hero（表示: System Product Name） |
+| CPU                 | AMD Ryzen 9 5950X 16-Core Processor                        |
+| CPUクーラー             | Arctic Liquid Freezer III Pro 280 A-RGB                    |
+| GPU                 | MSI GeForce RTX 5060 Ti 16G VENTUS 2X OC PLUS              |
+| メモリ                 | Patriot Viper Steel DDR4 3600MHz 64GB (32GB×2)             |
+| ストレージ               | WD_BLACK SN850X 2TB                                        |
+| PCケース               | Fractal Design Pop Air RGB Black TG                        |
+| 電源                  | 850W VITA GM                                               |
+| OS                  | Windows 11 Pro（Build 26200）                                |
+| Wi-Fi               | Intel Wi-Fi 6 AX200 160MHz                                 |
+| Bluetooth           | Intel Wireless Bluetooth                                   |
+| Galaxy Book Enabler | 3.1.5                                                      |
+| PowerShell          | 7.6.5 x64                                                  |
 
 Multi ControlやQuick ShareではWi-FiとBluetoothの構成が重要です。今回のPCでは、インストーラーのハードウェア検出でIntel AX200とIntel Bluetoothの両方が認識されました。
 
@@ -153,16 +158,16 @@ For best Samsung app compatibility, keep Intel Wi-Fi drivers on v23 and avoid v2
 
 今回は対話式メニューではなく、選択内容を明示した完全自動モードで実行しました。構成は次のとおりです。
 
-| 設定 | 選択内容 |
-|---|---|
-| 動作 | Install |
-| 偽装プロファイル | Galaxy Book4 Pro |
-| アプリ構成 | Recommended |
-| SSSE | インストールする |
-| SSSE戦略 | Dual |
-| パッケージ確認 | 承認済みとして続行 |
-| AI Selectショートカット | 作成しない |
-| ログ出力先 | `C:\GalaxyBook\Logs` |
+| 設定               | 選択内容                 |
+| ---------------- | -------------------- |
+| 動作               | Install              |
+| 偽装プロファイル         | Galaxy Book4 Pro     |
+| アプリ構成            | Recommended          |
+| SSSE             | インストールする             |
+| SSSE戦略           | Dual                 |
+| パッケージ確認          | 承認済みとして続行            |
+| AI Selectショートカット | 作成しない                |
+| ログ出力先            | `C:\GalaxyBook\Logs` |
 
 実行したコマンドは次の構成です。
 
@@ -188,29 +193,29 @@ For best Samsung app compatibility, keep Intel Wi-Fi drivers on v23 and avoid v2
 
 ### Core側
 
-- Samsung Account
-- Samsung Settings
-- Samsung Settings Runtime
-- Samsung Cloud関連コンポーネント
-- Knox Matrix for Windows
-- Galaxy Connect
-- Samsung Intelligence Service
-- Samsung Bluetooth Sync
-- Galaxy Book Experience
+* Samsung Account
+* Samsung Settings
+* Samsung Settings Runtime
+* Samsung Cloud関連コンポーネント
+* Knox Matrix for Windows
+* Galaxy Connect
+* Samsung Intelligence Service
+* Samsung Bluetooth Sync
+* Galaxy Book Experience
 
 ### Recommended側
 
-- Quick Share
-- Camera Share
-- Storage Share
-- Multi Control
-- Nearby Devices
-- Samsung Notes
-- AI Select
-- Samsung Gallery
-- Galaxy Buds
-- Samsung Pass
-- Second Screen
+* Quick Share
+* Camera Share
+* Storage Share
+* Multi Control
+* Nearby Devices
+* Samsung Notes
+* AI Select
+* Samsung Gallery
+* Galaxy Buds
+* Samsung Pass
+* Second Screen
 
 インストールログ上では、Samsung Settings Runtime、Samsung Cloud、Knox Matrix、Samsung Intelligence Service、Samsung Bluetooth Sync、Galaxy Book Experience、Quick Share、Camera Share、Storage Share、Nearby Devices、Samsung Notes、AI Select、Samsung Gallery、Galaxy Buds、Samsung Pass、Second Screenの成功記録を確認しました。
 
@@ -218,17 +223,17 @@ Multi Control、Samsung Account、Samsung Continuity Service、Samsung Settings�
 
 確認できた主なパッケージバージョンは以下です。
 
-| パッケージ | 確認したバージョン |
-|---|---:|
-| Multi Control | 2.7.1300.0 |
-| Samsung Continuity Service | 2.1.11.0 |
-| Samsung Account | 1.26.6021.0 |
-| Samsung Settings Runtime | 7.0.6.0 |
-| Samsung Settings | 8.0.13.0 |
-| Samsung Quick Share | 2.3.22.0 |
-| Samsung Notes | 4.3.826.0 |
-| Galaxy Buds | 6.9.8.0 |
-| Second Screen | 1.15.3.0 |
+| パッケージ                      | 確認したバージョン   |
+| -------------------------- | ----------- |
+| Multi Control              | 2.7.1300.0  |
+| Samsung Continuity Service | 2.1.11.0    |
+| Samsung Account            | 1.26.6021.0 |
+| Samsung Settings Runtime   | 7.0.6.0     |
+| Samsung Settings           | 8.0.13.0    |
+| Samsung Quick Share        | 2.3.22.0    |
+| Samsung Notes              | 4.3.826.0   |
+| Galaxy Buds                | 6.9.8.0     |
+| Second Screen              | 1.15.3.0    |
 
 ## SSSEとドライバーの確認
 
@@ -266,22 +271,22 @@ Galaxy Book Enablerは、インストール時だけ実行して終わる構成�
 
 ### 1. `GalaxyBookEnabler`
 
-- トリガー: Windows起動時
-- 遅延: 10秒
-- 実行ユーザー: `NT AUTHORITY\SYSTEM`
-- 実行レベル: 最上位
-- 役割: Galaxy Bookとして認識させる設定を起動ごとに適用
-- 実行ファイル: `C:\Users\aoe1928\.galaxy-book-enabler\GalaxyBookSpoof.bat`
+* トリガー: Windows起動時
+* 遅延: 10秒
+* 実行ユーザー: `NT AUTHORITY\SYSTEM`
+* 実行レベル: 最上位
+* 役割: Galaxy Bookとして認識させる設定を起動ごとに適用
+* 実行ファイル: `C:\Users\aoe1928\.galaxy-book-enabler\GalaxyBookSpoof.bat`
 
 ### 2. `GalaxyBookEnabler-MultiControlInit`
 
-- トリガー: Windows起動時
-- タスク側の遅延: 5分
-- スクリプト内部の待機: 60秒
-- 実行ユーザー: `NT AUTHORITY\SYSTEM`
-- 実行レベル: 最上位
-- 役割: Samsung関連サービスを再起動してMulti Controlの安定性を高める
-- 実行スクリプト: `C:\Users\aoe1928\.galaxy-book-enabler\Init-SamsungMultiControlOnLogin.ps1`
+* トリガー: Windows起動時
+* タスク側の遅延: 5分
+* スクリプト内部の待機: 60秒
+* 実行ユーザー: `NT AUTHORITY\SYSTEM`
+* 実行レベル: 最上位
+* 役割: Samsung関連サービスを再起動してMulti Controlの安定性を高める
+* 実行スクリプト: `C:\Users\aoe1928\.galaxy-book-enabler\Init-SamsungMultiControlOnLogin.ps1`
 
 つまり、Multi Controlの安定化処理が終わるのはWindows起動からおよそ6分後です。起動直後に端末が見つからなくても、数分待つと状況が変わる可能性があります。
 
@@ -413,19 +418,19 @@ cd C:\GalaxyBookEnabler-main
 
 ## 注意点と限界
 
-- SamsungおよびMicrosoftの公式サポート対象外の構成です。
-- Windows UpdateやSamsungアプリのアップデートで動かなくなる可能性があります。
-- Galaxy Book Enablerの更新後は設定の再適用が必要になる場合があります。
-- PC構成が異なれば、同じプロファイルやSSSE戦略で同じ結果になるとは限りません。
-- Quick Shareなど一部機能は、Wi-Fi／Bluetoothチップやドライバーの相性に左右されます。
-- セキュリティソフトを一時停止する方法はリスクがあるため、今回の作業では行っていません。
-- 実行ポリシーをシステム全体で `Unrestricted` に変更する方法も採用していません。PowerShell起動時の `-ExecutionPolicy Bypass` を対象プロセスに限定して使用しました。
+* SamsungおよびMicrosoftの公式サポート対象外の構成です。
+* Windows UpdateやSamsungアプリのアップデートで動かなくなる可能性があります。
+* Galaxy Book Enablerの更新後は設定の再適用が必要になる場合があります。
+* PC構成が異なれば、同じプロファイルやSSSE戦略で同じ結果になるとは限りません。
+* Quick Shareなど一部機能は、Wi-Fi／Bluetoothチップやドライバーの相性に左右されます。
+* セキュリティソフトを一時停止する方法はリスクがあるため、今回の作業では行っていません。
+* 実行ポリシーをシステム全体で `Unrestricted` に変更する方法も採用していません。PowerShell起動時の `-ExecutionPolicy Bypass` を対象プロセスに限定して使用しました。
 
 ## 参考リンク
 
-- [YouTube: How to Install Samsung Apps on ANY Windows PC (Galaxy Book Enabler)](https://www.youtube.com/watch?v=gu84-uucvDk)
-- [GitHub: Bananz0/GalaxyBookEnabler](https://github.com/Bananz0/GalaxyBookEnabler)
-- [GitHub: PowerShell/PowerShell Releases](https://github.com/PowerShell/PowerShell/releases)
+* [YouTube: How to Install Samsung Apps on ANY Windows PC (Galaxy Book Enabler)](https://www.youtube.com/watch?v=gu84-uucvDk)
+* [GitHub: Bananz0/GalaxyBookEnabler](https://github.com/Bananz0/GalaxyBookEnabler)
+* [GitHub: PowerShell/PowerShell Releases](https://github.com/PowerShell/PowerShell/releases)
 
 ## まとめ
 
@@ -433,23 +438,23 @@ cd C:\GalaxyBookEnabler-main
 
 重要だったのは、単にスクリプトを実行するだけでなく、次の点を確認したことです。
 
-- 実行前にREADMEとスクリプトの要件を確認する
-- PowerShell MSIのハッシュを検証する
-- UAC昇格と終了コードを確認する
-- パッケージ、サービス、ドライバー、タスクを個別に検証する
-- インストール後にWindowsを明示的に再起動する
-- 起動後の安定化タスクが終わるまで待つ
-- ログから成功と警告を区別する
+* 実行前にREADMEとスクリプトの要件を確認する
+* PowerShell MSIのハッシュを検証する
+* UAC昇格と終了コードを確認する
+* パッケージ、サービス、ドライバー、タスクを個別に検証する
+* インストール後にWindowsを明示的に再起動する
+* 起動後の安定化タスクが終わるまで待つ
+* ログから成功と警告を区別する
 
 特に、インストール直後に動かなくても、既存のGalaxy Connectプロセスが残っている場合があります。今回のケースではWindows再起動が最後の決め手になりました。
 
----
+- - -
 
 ## 公開前チェックリスト
 
-- [ ] `%USERPROFILE%`へ置換し、Windowsユーザー名を伏せる
-- [ ] ログやスクリーンショットにメールアドレス、Samsung Account名、端末名が映っていないか確認する
-- [ ] 使用したGalaxy端末の機種名とOSバージョンを必要に応じて追記する
-- [x] Galaxy Book EnablerのリポジトリURLと参考動画URLを追記する
-- [ ] 非公式ツールである旨と自己責任の注意書きを残す
-- [ ] 公開時点でバージョンや配布ファイルが変わっていないか再確認する
+* `%USERPROFILE%`へ置換し、Windowsユーザー名を伏せる
+* ログやスクリーンショットにメールアドレス、Samsung Account名、端末名が映っていないか確認する
+* 使用したGalaxy端末の機種名とOSバージョンを必要に応じて追記する
+* Galaxy Book EnablerのリポジトリURLと参考動画URLを追記する
+* 非公式ツールである旨と自己責任の注意書きを残す
+* 公開時点でバージョンや配布ファイルが変わっていないか再確認する
