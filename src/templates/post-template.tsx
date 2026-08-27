@@ -167,6 +167,63 @@ const PostTemplate: React.FC<Props> = ({ data, pageContext }) => {
       return <Link to={href} language={language} style={linkStyle}>{children}</Link>;
     };
 
+    const ArticleH1 = ({ children }) => (
+      <Typography
+        component="h1"
+        sx={{
+          maxWidth: '920px',
+          mx: 'auto',
+          mt: { xs: 5, sm: 7 },
+          mb: { xs: 3, sm: 4 },
+          textAlign: 'center',
+          fontSize: 'clamp(1.9rem, 5vw, 3.5rem)',
+          fontWeight: 850,
+          lineHeight: 1.18,
+          letterSpacing: '-0.025em',
+          overflowWrap: 'anywhere',
+          textWrap: 'balance',
+          background: 'linear-gradient(110deg, #66ff66 15%, #b5ffbd 58%, #ffb6c1 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+        }}
+      >
+        {children}
+      </Typography>
+    );
+
+    const ArticleH2 = ({ children }) => (
+      <Typography
+        component="h2"
+        sx={{
+          maxWidth: '760px',
+          mx: 'auto',
+          mt: { xs: 6, sm: 8 },
+          mb: { xs: 3, sm: 4 },
+          px: 2,
+          textAlign: 'center',
+          color: '#f7fff7',
+          fontSize: 'clamp(1.4rem, 3vw, 2rem)',
+          fontWeight: 800,
+          lineHeight: 1.35,
+          letterSpacing: '0.01em',
+          textWrap: 'balance',
+          '&::after': {
+            content: '""',
+            display: 'block',
+            width: '72px',
+            height: '3px',
+            mx: 'auto',
+            mt: 1.5,
+            borderRadius: '999px',
+            background: 'linear-gradient(90deg, #66ff66, #ffb6c1)',
+          },
+        }}
+      >
+        {children}
+      </Typography>
+    );
+
   const article = (
     <Layout>
       <Box display="flex" alignItems="center">
@@ -177,13 +234,38 @@ const PostTemplate: React.FC<Props> = ({ data, pageContext }) => {
           </IconButton>
         </Link>
       </Box>
-      <Typography variant="h1" gutterBottom sx={{ color: '#66ff66' }}>{frontmatter.title}</Typography>
-      <Typography variant="subtitle1" gutterBottom>{frontmatter.date}</Typography>
-      <CategoryTrail categories={categories} />
+      <Box component="header" sx={{ maxWidth: '980px', mx: 'auto', mb: { xs: 4, sm: 5 }, textAlign: 'center' }}>
+        <Typography
+          component="h1"
+          sx={{
+            maxWidth: '940px',
+            mx: 'auto',
+            mb: 2,
+            fontSize: 'clamp(2rem, 5.2vw, 4rem)',
+            fontWeight: 900,
+            lineHeight: 1.14,
+            letterSpacing: '-0.035em',
+            overflowWrap: 'anywhere',
+            textWrap: 'balance',
+            background: 'linear-gradient(110deg, #66ff66 10%, #9cffaa 58%, #ffb6c1 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}
+        >
+          {frontmatter.title}
+        </Typography>
+        <Typography variant="subtitle2" sx={{ color: 'text.secondary', letterSpacing: '0.08em' }}>
+          {frontmatter.date}
+        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <CategoryTrail categories={categories} />
+        </Box>
+      </Box>
       <MDXProvider components={MDXComponents}>
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
-          components={{ a: LinkRenderer, img: ArticleImage }}
+          components={{ a: LinkRenderer, img: ArticleImage, h1: ArticleH1, h2: ArticleH2 }}
         >
           {body}
         </ReactMarkdown>

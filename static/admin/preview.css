@@ -1,4 +1,39 @@
 /* Keep CMS editor images close to their size on the published article page. */
+body h1 {
+  max-width: 920px;
+  margin: 32px auto 20px;
+  text-align: center;
+  color: #155f32;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 850;
+  line-height: 1.18;
+  letter-spacing: -0.025em;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+body h2 {
+  max-width: 760px;
+  margin: 56px auto 28px;
+  padding: 0 16px;
+  text-align: center;
+  color: #17382a;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 800;
+  line-height: 1.35;
+  text-wrap: balance;
+}
+
+body h2::after {
+  content: "";
+  display: block;
+  width: 72px;
+  height: 3px;
+  margin: 12px auto 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #26b85a, #e78ca0);
+}
+
 body img {
   display: block;
   width: auto !important;
