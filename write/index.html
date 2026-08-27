@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow,noarchive">
+    <title>旅の下書き | ちよじのホームページ</title>
+    <link rel="stylesheet" href="/write/style.css?v=20260827-local-first">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">CHIYOJI LOCAL WRITER</p>
+        <h1>旅の下書き</h1>
+      </div>
+      <div class="topbar__actions">
+        <span class="save-state" id="save-state">準備中…</span>
+        <button class="button button--ghost" id="new-draft" type="button">新しい下書き</button>
+        <button class="button button--primary" id="publish" type="button">GitHubへ保存</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="editor" aria-label="記事編集">
+        <div class="field-grid">
+          <label class="field field--wide">
+            <span>タイトル</span>
+            <input id="title" type="text" placeholder="旅先で見つけたもの">
+          </label>
+          <label class="field">
+            <span>公開日</span>
+            <input id="date" type="date">
+          </label>
+          <label class="field">
+            <span>URL（空欄でもOK）</span>
+            <input id="slug" type="text" inputmode="url" placeholder="tokyo-day-1">
+          </label>
+          <label class="draft-toggle field--wide">
+            <input id="draft" type="checkbox" checked>
+            <span><strong>下書きとしてGitHubへ保存</strong><small>通常のブログには出さず、合言葉付きプレビューにだけ表示します。</small></span>
+          </label>
+        </div>
+
+        <fieldset class="categories">
+          <legend>分類</legend>
+          <label><input type="checkbox" value="travel">旅行</label>
+          <label><input type="checkbox" value="gadgets">ガジェット</label>
+          <label><input type="checkbox" value="lifestyle">ライフハック</label>
+          <label><input type="checkbox" value="technology">技術</label>
+          <label><input type="checkbox" value="music">音楽</label>
+          <label><input type="checkbox" value="second-waltz">セカンドワルツ</label>
+          <label><input type="checkbox" value="purgatorio">Purgatorio</label>
+          <label><input type="checkbox" value="live">ライブ</label>
+          <label><input type="checkbox" value="merchandise">グッズ</label>
+          <label><input type="checkbox" value="release">リリース</label>
+          <label><input type="checkbox" value="site-news">サイトのお知らせ</label>
+        </fieldset>
+
+        <section class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="画像を追加">
+          <input id="image-input" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden>
+          <span class="dropzone__icon">＋</span>
+          <strong>写真をここへドロップ</strong>
+          <span>またはクリックして複数選択</span>
+          <small>端末内でWebPへ変換してから保存します</small>
+        </section>
+
+        <div class="block-list" id="block-list"></div>
+        <button class="add-text" id="add-text" type="button">＋ 文章ブロックを追加</button>
+      </section>
+
+      <aside class="preview" aria-label="プレビュー">
+        <div class="preview__header">
+          <span>プレビュー</span>
+          <span class="local-badge">LOCAL</span>
+        </div>
+        <article class="preview__article" id="preview-article">
+          <p class="preview__date" id="preview-date">今日</p>
+          <h2 id="preview-title">旅先で見つけたもの</h2>
+          <div class="preview__body" id="preview-body">
+            <p class="preview__lead">文章と写真は、GitHubへ保存するまでこの端末だけに残ります。</p>
+          </div>
+        </article>
+      </aside>
+    </main>
+
+    <dialog class="confirm-dialog" id="confirm-dialog">
+      <form method="dialog">
+        <h2 id="confirm-title">GitHubへ保存しますか？</h2>
+        <p id="confirm-message"></p>
+        <div class="confirm-dialog__actions">
+          <button class="button button--ghost" value="cancel">キャンセル</button>
+          <button class="button button--primary" value="confirm">保存する</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+    <script src="/write/app.js?v=20260827-local-first"></script>
+  </body>
+</html>
