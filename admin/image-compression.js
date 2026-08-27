@@ -295,8 +295,25 @@
     return "";
   }
 
-  function mediaFallbackPath(name) {
-    return name ? `/images/blog/${name}` : "";
+  function normalizeMediaUrl(value, fallbackName = "") {
+    let path = String(value || fallbackName || "").trim().replace(/\\/g, "/");
+    if (!path) return "";
+
+    if (/^https?:\/\//i.test(path)) {
+      try {
+        path = new URL(path).pathname;
+      } catch {
+        // Keep the original value and normalize it below.
+      }
+    }
+
+    path = path.split(/[?#]/, 1)[0];
+    while (path.startsWith("./")) path = path.slice(2);
+    path = path.replace(/^\/+/, "").replace(/^static\//i, "");
+
+    if (/^images\/blog\//i.test(path)) return `/${path}`;
+    if (/^[^/]+\.(jpe?g|png|webp|gif|svg)$/i.test(path)) return `/images/blog/${path}`;
+    return path ? `/${path}` : "";
   }
 
   function selectedMediaNameFromStyles(dialog) {
@@ -338,7 +355,7 @@
         // Clipboard reading may be blocked; use the selected card's filename.
       }
     }
-    path ||= mediaFallbackPath(lastSelectedMediaName || selectedMediaNameFromStyles(dialog));
+    path = normalizeMediaUrl(path, lastSelectedMediaName || selectedMediaNameFromStyles(dialog));
     if (!path) throw new Error("選択した画像のパスを取得できませんでした。「パスをコピー」を一度押してから選択してください。");
 
     const closeButton = buttons.find((button) => /閉じる|close/i.test(button.getAttribute("aria-label") || ""));
