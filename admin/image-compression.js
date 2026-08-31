@@ -214,7 +214,7 @@
     const dialog = target.closest('[role="dialog"], [aria-modal="true"]');
     if (!dialog) return null;
     const text = dialog.textContent || "";
-    return /メディア|media/i.test(text) && /アップロード|upload/i.test(text) ? dialog : null;
+    return /メディア|画像|media|image/i.test(text) && /アップロード|upload/i.test(text) ? dialog : null;
   }
 
   function currentMediaDialog() {
