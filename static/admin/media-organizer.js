@@ -216,13 +216,33 @@
     element.style.display = visible ? element.dataset.chiyojiOriginalDisplay : "none";
   }
 
-  function positionEntries(entries, sortedVisible) {
+  function originalPosition(wrapper) {
+    const currentLeft = wrapper.style.left;
+    const currentTop = wrapper.style.top;
+    const assignedLeft = wrapper.dataset.chiyojiAssignedLeft;
+    const assignedTop = wrapper.dataset.chiyojiAssignedTop;
+    if (
+      wrapper.dataset.chiyojiOriginalLeft === undefined ||
+      (assignedLeft !== undefined && currentLeft !== assignedLeft) ||
+      (assignedTop !== undefined && currentTop !== assignedTop)
+    ) {
+      wrapper.dataset.chiyojiOriginalLeft = currentLeft;
+      wrapper.dataset.chiyojiOriginalTop = currentTop;
+    }
+    return {
+      left: wrapper.dataset.chiyojiOriginalLeft,
+      top: wrapper.dataset.chiyojiOriginalTop,
+    };
+  }
+
+  function positionEntries(entries, sortedVisible, topOffset) {
     const slots = entries
-      .map(({ wrapper }) => ({
-        left: wrapper.style.left,
-        top: wrapper.style.top,
-        leftNumber: Number.parseFloat(wrapper.style.left) || 0,
-        topNumber: Number.parseFloat(wrapper.style.top) || 0,
+      .map(({ wrapper }) => originalPosition(wrapper))
+      .map(({ left, top }) => ({
+        left,
+        top,
+        leftNumber: Number.parseFloat(left) || 0,
+        topNumber: Number.parseFloat(top) || 0,
       }))
       .sort((left, right) => left.topNumber - right.topNumber || left.leftNumber - right.leftNumber);
 
@@ -230,7 +250,9 @@
       const slot = slots[index];
       if (!slot) return;
       entry.wrapper.style.left = slot.left;
-      entry.wrapper.style.top = slot.top;
+      entry.wrapper.style.top = `${slot.topNumber + topOffset}px`;
+      entry.wrapper.dataset.chiyojiAssignedLeft = entry.wrapper.style.left;
+      entry.wrapper.dataset.chiyojiAssignedTop = entry.wrapper.style.top;
     });
   }
 
@@ -260,7 +282,10 @@
       (selectedDate === "all" || date.key === selectedDate) &&
       (selectedType === "all" || fileType.key === selectedType)
     ));
-    positionEntries(entries, visibleEntries);
+    const toolbarOffset = Math.ceil(toolbar.getBoundingClientRect().height) + 10;
+    grid.style.boxSizing = "content-box";
+    grid.style.paddingBottom = `${toolbarOffset}px`;
+    positionEntries(entries, visibleEntries, toolbarOffset);
     const visibleCards = new Set(visibleEntries.map(({ card }) => card));
 
     for (const entry of entries) {
