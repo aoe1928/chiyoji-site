@@ -93,7 +93,22 @@
     return "min-width:142px;padding:7px 30px 7px 10px;border:1px solid #aebbc1;border-radius:6px;background:#fff;color:#253238";
   }
 
-  function ensureToolbar(dialog, grid, dates, fileTypes) {
+  function dateInputStyle() {
+    return "width:132px;padding:6px 8px;border:1px solid #aebbc1;border-radius:6px;background:#fff;color:#253238;font:inherit";
+  }
+
+  function dateKey(value) {
+    return /^\d{4}-\d{2}-\d{2}$/.test(value) ? value.replaceAll("-", "") : "";
+  }
+
+  function isDateInRange(date, from, to) {
+    if (date.key === "unknown") return !from && !to;
+    const fromKey = dateKey(from);
+    const toKey = dateKey(to);
+    return (!fromKey || date.key >= fromKey) && (!toKey || date.key <= toKey);
+  }
+
+  function ensureToolbar(dialog, grid, fileTypes) {
     let toolbar = dialog.querySelector(`.${organizerClass}`);
     if (!toolbar) {
       toolbar = document.createElement("div");
@@ -124,9 +139,16 @@
             <option value="name-desc">名前（降順）</option>
           </select>
         </label>
-        <label style="${controlStyle}">日付
-          <select data-control="date" aria-label="写真を日付で絞り込む" style="${selectStyle()}"></select>
-        </label>
+        <div role="group" aria-label="写真の日付範囲" style="${controlStyle}">
+          <span>日付</span>
+          <label style="${controlStyle}">開始
+            <input type="date" data-control="date-from" aria-label="開始日" style="${dateInputStyle()}">
+          </label>
+          <span aria-hidden="true">〜</span>
+          <label style="${controlStyle}">終了
+            <input type="date" data-control="date-to" aria-label="終了日" style="${dateInputStyle()}">
+          </label>
+        </div>
         <label style="${controlStyle}">種類
           <select data-control="type" aria-label="写真をファイル種類で絞り込む" style="${selectStyle()}"></select>
         </label>
@@ -136,40 +158,45 @@
       const anchor = grid.parentElement;
       anchor.insertBefore(toolbar, grid);
       toolbar.addEventListener("change", (event) => {
-        const select = event.target;
-        if (!(select instanceof HTMLSelectElement)) return;
-        if (select.dataset.control === "sort") dialog.dataset.chiyojiMediaSort = select.value;
-        if (select.dataset.control === "date") dialog.dataset.chiyojiMediaDate = select.value;
-        if (select.dataset.control === "type") dialog.dataset.chiyojiMediaType = select.value;
+        const control = event.target;
+        if (!(control instanceof HTMLSelectElement || control instanceof HTMLInputElement)) return;
+        if (control.dataset.control === "sort") dialog.dataset.chiyojiMediaSort = control.value;
+        if (control.dataset.control === "date-from") dialog.dataset.chiyojiMediaDateFrom = control.value;
+        if (control.dataset.control === "date-to") dialog.dataset.chiyojiMediaDateTo = control.value;
+        if (control.dataset.control === "type") dialog.dataset.chiyojiMediaType = control.value;
         organizeDialog(dialog);
       });
       toolbar.querySelector("[data-reset]").addEventListener("click", () => {
         dialog.dataset.chiyojiMediaSort = "date-desc";
-        dialog.dataset.chiyojiMediaDate = "all";
+        dialog.dataset.chiyojiMediaDateFrom = "";
+        dialog.dataset.chiyojiMediaDateTo = "";
         dialog.dataset.chiyojiMediaType = "all";
         organizeDialog(dialog);
       });
     }
 
     const sortSelect = toolbar.querySelector('[data-control="sort"]');
-    const dateSelect = toolbar.querySelector('[data-control="date"]');
+    const dateFromInput = toolbar.querySelector('[data-control="date-from"]');
+    const dateToInput = toolbar.querySelector('[data-control="date-to"]');
     const typeSelect = toolbar.querySelector('[data-control="type"]');
-    setSelectOptions(dateSelect, dates, "すべての日付");
     setSelectOptions(typeSelect, fileTypes, "すべての種類");
 
     const requested = {
       sort: dialog.dataset.chiyojiMediaSort || "date-desc",
-      date: dialog.dataset.chiyojiMediaDate || "all",
+      dateFrom: dialog.dataset.chiyojiMediaDateFrom || "",
+      dateTo: dialog.dataset.chiyojiMediaDateTo || "",
       type: dialog.dataset.chiyojiMediaType || "all",
     };
     if (!SORT_LABELS[requested.sort]) requested.sort = "date-desc";
-    if (!Array.from(dateSelect.options).some((option) => option.value === requested.date)) requested.date = "all";
+    if (!dateKey(requested.dateFrom)) requested.dateFrom = "";
+    if (!dateKey(requested.dateTo)) requested.dateTo = "";
     if (!Array.from(typeSelect.options).some((option) => option.value === requested.type)) requested.type = "all";
     for (const [key, value] of Object.entries(requested)) {
       dialog.dataset[`chiyojiMedia${key[0].toUpperCase()}${key.slice(1)}`] = value;
     }
     sortSelect.value = requested.sort;
-    dateSelect.value = requested.date;
+    dateFromInput.value = requested.dateFrom;
+    dateToInput.value = requested.dateTo;
     typeSelect.value = requested.type;
     return toolbar;
   }
@@ -261,25 +288,20 @@
     if (!grid || !entries.length) return;
 
     const datedEntries = entries.filter(({ name }) => name !== ".gitkeep");
-    const dates = Array.from(new Map(
-      datedEntries
-        .map(({ date }) => date)
-        .sort((left, right) => right.sortKey.localeCompare(left.sortKey))
-        .map((date) => [date.key, date]),
-    ).values());
     const fileTypes = Array.from(new Map(
       datedEntries
         .map(({ fileType }) => fileType)
         .sort((left, right) => left.label.localeCompare(right.label, "ja"))
         .map((fileType) => [fileType.key, fileType]),
     ).values());
-    const toolbar = ensureToolbar(dialog, grid, dates, fileTypes);
+    const toolbar = ensureToolbar(dialog, grid, fileTypes);
     const selectedSort = dialog.dataset.chiyojiMediaSort || "date-desc";
-    const selectedDate = dialog.dataset.chiyojiMediaDate || "all";
+    const selectedDateFrom = dialog.dataset.chiyojiMediaDateFrom || "";
+    const selectedDateTo = dialog.dataset.chiyojiMediaDateTo || "";
     const selectedType = dialog.dataset.chiyojiMediaType || "all";
     const sorted = sortEntries(datedEntries, selectedSort);
     const visibleEntries = sorted.filter(({ date, fileType }) => (
-      (selectedDate === "all" || date.key === selectedDate) &&
+      isDateInRange(date, selectedDateFrom, selectedDateTo) &&
       (selectedType === "all" || fileType.key === selectedType)
     ));
     const toolbarOffset = Math.ceil(toolbar.getBoundingClientRect().height) + 10;
@@ -321,5 +343,5 @@
   new MutationObserver(scheduleScan).observe(document.documentElement, { childList: true, subtree: true });
   scheduleScan();
 
-  window.ChiyojiMediaOrganizer = Object.freeze({ dateFromName, fileTypeFromName, sortEntries });
+  window.ChiyojiMediaOrganizer = Object.freeze({ dateFromName, fileTypeFromName, isDateInRange, sortEntries });
 })();
