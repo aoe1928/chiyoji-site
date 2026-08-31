@@ -240,7 +240,7 @@
       Object.assign(overlay.style, {
         position: "fixed",
         zIndex: "2147483646",
-        display: "grid",
+        display: "none",
         placeContent: "center",
         gap: "8px",
         border: "3px dashed #16746a",
@@ -263,11 +263,15 @@
       height: `${Math.max(0, rect.height - 28)}px`,
     });
     overlay.hidden = false;
+    overlay.style.display = "grid";
   }
 
   function hideMediaDropOverlay() {
     const overlay = document.getElementById("chiyoji-media-drop-overlay");
-    if (overlay) overlay.hidden = true;
+    if (overlay) {
+      overlay.hidden = true;
+      overlay.style.display = "none";
+    }
   }
 
   function compactText(element) {
