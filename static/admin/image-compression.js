@@ -398,36 +398,13 @@
     return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
   }
 
-  async function insertSelectedMediaAsUrl(dialog) {
-    if (!activeImageWidgetRoot) {
-      throw new Error("URLの入力先を見つけられませんでした。画像欄の「他の画像を選択」から開き直してください。");
-    }
+  async function normalizeSelectedMediaAfterChoice(widgetRoot, selectedName) {
+    const path = normalizeMediaUrl("", selectedName);
+    if (!path) throw new Error("選択した画像のファイル名を取得できませんでした。");
 
-    const selectedName = lastSelectedMediaName || selectedMediaNameFromStyles(dialog);
-    lastCopiedMediaPath = "";
-    const buttons = Array.from(dialog.querySelectorAll("button"));
-    const copyButton = buttons.find((button) => /パスをコピー|名前をコピー|copy(path|name|url)/i.test(compactText(button)));
-    if (copyButton && !copyButton.disabled) copyButton.click();
-    await wait(80);
-
-    let path = lastCopiedMediaPath;
-    if (!path && navigator.clipboard?.readText) {
-      try {
-        const copied = await navigator.clipboard.readText();
-        if (/\.(jpe?g|png|webp|gif|svg)$/i.test(copied)) path = copied;
-      } catch {
-        // Clipboard reading may be blocked; use the selected card's filename.
-      }
-    }
-    path = normalizeMediaUrl(path, selectedName);
-    if (!path) throw new Error("選択した画像のパスを取得できませんでした。「パスをコピー」を一度押してから選択してください。");
-
-    const closeButton = buttons.find((button) => /閉じる|close/i.test(button.getAttribute("aria-label") || ""));
-    if (!closeButton) throw new Error("画像一覧を閉じられませんでした。");
-    closeButton.click();
-    await wait(380);
-
-    const urlButton = Array.from(activeImageWidgetRoot.querySelectorAll("button")).find(isUrlButton);
+    // Let Decap register pending editor uploads and close the media dialog first.
+    await wait(500);
+    const urlButton = Array.from(widgetRoot.querySelectorAll("button")).find(isUrlButton);
     if (!urlButton) throw new Error("画像のURL入力ボタンを見つけられませんでした。");
     const nativePrompt = window.prompt;
     window.prompt = () => path;
@@ -436,9 +413,9 @@
     } finally {
       window.prompt = nativePrompt;
     }
-    activeImageWidgetRoot = null;
+    if (activeImageWidgetRoot === widgetRoot) activeImageWidgetRoot = null;
     lastSelectedMediaName = "";
-    showStatus(`URLとして挿入しました：${path}`, "done", 7000);
+    showStatus(`画像パスを補正しました：${path}`, "done", 7000);
   }
 
   document.addEventListener(
@@ -462,11 +439,11 @@
       const mediaName = mediaNameFromClick(target, dialog);
       if (mediaName) lastSelectedMediaName = mediaName;
 
-      if (button && /^選択する$|^choose(selected)?$/i.test(compactText(button))) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        insertSelectedMediaAsUrl(dialog).catch((error) => {
-          showStatus(error.message || "画像URLの入力に失敗しました。", "error", 10000);
+      if (button && /^選択する$|^choose(selected)?$/i.test(compactText(button)) && activeImageWidgetRoot) {
+        const widgetRoot = activeImageWidgetRoot;
+        const selectedName = lastSelectedMediaName || selectedMediaNameFromStyles(dialog);
+        normalizeSelectedMediaAfterChoice(widgetRoot, selectedName).catch((error) => {
+          showStatus(error.message || "画像パスの補正に失敗しました。", "error", 10000);
         });
       }
     },
