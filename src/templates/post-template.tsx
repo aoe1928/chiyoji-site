@@ -245,6 +245,9 @@ const PostTemplate: React.FC<Props> = ({ data, pageContext }) => {
     //   const url = `${process.env.GATSBY_SITE_URL}${fields.slug}`;
     const url = `https://www.aoe1928.com${language === 'en' ? '/en' : ''}${fields.slug}`;
     const title = frontmatter.title;
+    const encodedArticleUrl = encodeURI(url);
+    const twitterShareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(encodedArticleUrl)}&text=${encodeURIComponent(title)}`;
+    const instagramShareUrl = `https://www.instagram.com/?url=${encodeURIComponent(encodedArticleUrl)}`;
   // const photo = frontmatter.photo;
   const { photo } = frontmatter;
     const classes = useStyles();
@@ -463,7 +466,7 @@ const PostTemplate: React.FC<Props> = ({ data, pageContext }) => {
         <IconButton
           className={classes.shareButton}
           component="a"
-          href={`https://twitter.com/intent/tweet?url=${url}&text=${title}`}
+          href={twitterShareUrl}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Share on Twitter"
@@ -473,7 +476,7 @@ const PostTemplate: React.FC<Props> = ({ data, pageContext }) => {
         <IconButton
           className={classes.shareButton}
           component="a"
-          href={`https://www.instagram.com/?url=${url}`}
+          href={instagramShareUrl}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Share on Instagram"
