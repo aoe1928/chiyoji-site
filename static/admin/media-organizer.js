@@ -30,6 +30,12 @@
     return /メディア|画像|media|image/i.test(text) && /アップロード|upload/i.test(text) ? dialog : null;
   }
 
+  function isEditorMediaPicker(dialog) {
+    return Array.from(dialog.querySelectorAll("button")).some(
+      (button) => /^選択する$|^choose(selected)?$/i.test(compactText(button)),
+    );
+  }
+
   function dateFromName(name) {
     const match = name.match(/^((?:19|20)\d{2})(0[1-9]|1[0-2])([0-2]\d|3[01])(?:[_-]?(\d{2})(\d{2})(\d{2})?)?/);
     if (!match) {
@@ -284,6 +290,10 @@
   }
 
   function organizeDialog(dialog) {
+    // Decap's virtualized picker maps clicks from its original card coordinates.
+    // Moving those cards makes the visible image and selected asset diverge.
+    if (isEditorMediaPicker(dialog)) return;
+
     const { grid, entries } = findMediaEntries(dialog);
     if (!grid || !entries.length) return;
 
