@@ -209,6 +209,48 @@
     return transfer;
   }
 
+  function padNumber(value) {
+    return String(value).padStart(2, "0");
+  }
+
+  function clipboardImageName(file, index) {
+    if (/^(?:19|20)\d{6}/.test(file.name || "")) return file.name;
+    const now = new Date();
+    const timestamp = [
+      now.getFullYear(),
+      padNumber(now.getMonth() + 1),
+      padNumber(now.getDate()),
+      "_",
+      padNumber(now.getHours()),
+      padNumber(now.getMinutes()),
+      padNumber(now.getSeconds()),
+    ].join("");
+    const extensionByType = {
+      "image/jpeg": "jpg",
+      "image/png": "png",
+      "image/webp": "webp",
+      "image/gif": "gif",
+      "image/svg+xml": "svg",
+    };
+    const originalExtension = file.name?.match(/\.([a-z0-9]+)$/i)?.[1]?.toLowerCase();
+    const extension = extensionByType[file.type.toLowerCase()] || originalExtension || "png";
+    const suffix = index ? `_${padNumber(index + 1)}` : "";
+    return `${timestamp}${suffix}.${extension}`;
+  }
+
+  function clipboardImageFiles(clipboardData) {
+    const itemFiles = Array.from(clipboardData?.items || [])
+      .filter((item) => item.kind === "file" && item.type.startsWith("image/"))
+      .map((item) => item.getAsFile())
+      .filter((file) => file instanceof File);
+    const files = itemFiles.length ? itemFiles : Array.from(clipboardData?.files || [])
+      .filter((file) => file instanceof File && file.type.startsWith("image/"));
+    return files.map((file, index) => new File([file], clipboardImageName(file, index), {
+      type: file.type,
+      lastModified: Date.now(),
+    }));
+  }
+
   function mediaDialogFor(target) {
     if (!(target instanceof Element)) return null;
     const dialog = target.closest('[role="dialog"], [aria-modal="true"]');
@@ -229,6 +271,17 @@
     return Array.from(document.querySelectorAll('input[type="file"]')).find(
       (input) => input instanceof HTMLInputElement && /image|jpe?g|png|webp/i.test(input.accept || "image"),
     ) || null;
+  }
+
+  function addPreparedFilesToMedia(dialog, results) {
+    const input = mediaUploadInput(dialog);
+    if (!input) {
+      throw new Error("アップロード欄を見つけられませんでした。画面上部の「アップロードする」を一度押してください。");
+    }
+    input.multiple = true;
+    input.files = filesDataTransfer(results).files;
+    replayingInputs.add(input);
+    input.dispatchEvent(new Event("change", { bubbles: true }));
   }
 
   function showMediaDropOverlay(dialog) {
@@ -475,6 +528,31 @@
   );
 
   document.addEventListener(
+    "paste",
+    (event) => {
+      const dialog = mediaDialogFor(event.target) || currentMediaDialog();
+      if (!dialog) return;
+      const files = clipboardImageFiles(event.clipboardData);
+      if (!files.length) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      prepareFiles(files)
+        .then((results) => {
+          if (activeImageWidgetRoot && results.length === 1) {
+            lastSelectedMediaName = results[0].file.name;
+          }
+          addPreparedFilesToMedia(dialog, results);
+          showStatus(`${results.length}枚の画像を貼り付けてメディア追加を開始しました。`, "done", 7000);
+        })
+        .catch((error) => {
+          showStatus(error.message || "コピーした画像の貼り付けに失敗しました。", "error", 10000);
+        });
+    },
+    true,
+  );
+
+  document.addEventListener(
     "dragover",
     (event) => {
       if (!event.dataTransfer?.types?.includes("Files")) return;
@@ -512,12 +590,7 @@
       prepareFiles(files)
         .then((results) => {
           if (mediaDialog) {
-            const input = mediaUploadInput(mediaDialog);
-            if (!input) throw new Error("アップロード欄を見つけられませんでした。画面上部の「アップロードする」を一度押してください。");
-            input.multiple = true;
-            input.files = filesDataTransfer(results).files;
-            replayingInputs.add(input);
-            input.dispatchEvent(new Event("change", { bubbles: true }));
+            addPreparedFilesToMedia(mediaDialog, results);
             showStatus(`${results.length}枚のメディア追加を開始しました。`, "done", 7000);
             return;
           }
@@ -536,5 +609,5 @@
     true,
   );
 
-  window.ChiyojiImageCompression = Object.freeze({ compressFile, settings: SETTINGS });
+  window.ChiyojiImageCompression = Object.freeze({ clipboardImageName, compressFile, settings: SETTINGS });
 })();
