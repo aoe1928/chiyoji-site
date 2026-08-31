@@ -16,6 +16,7 @@
     "name-desc": "名前（降順）",
   });
   const organizerClass = "chiyoji-media-organizer";
+  const replayingPickerClicks = new WeakSet();
   let scanScheduled = false;
 
   function compactText(element) {
@@ -289,11 +290,17 @@
     });
   }
 
-  function organizeDialog(dialog) {
-    // Decap's virtualized picker maps clicks from its original card coordinates.
-    // Moving those cards makes the visible image and selected asset diverge.
-    if (isEditorMediaPicker(dialog)) return;
+  function restoreNativePositions(entries) {
+    for (const entry of entries) {
+      const position = originalPosition(entry.wrapper);
+      entry.wrapper.style.left = position.left;
+      entry.wrapper.style.top = position.top;
+      delete entry.wrapper.dataset.chiyojiAssignedLeft;
+      delete entry.wrapper.dataset.chiyojiAssignedTop;
+    }
+  }
 
+  function organizeDialog(dialog) {
     const { grid, entries } = findMediaEntries(dialog);
     if (!grid || !entries.length) return;
 
@@ -336,6 +343,32 @@
     const countElement = toolbar.querySelector("[data-count]");
     if (countElement.textContent !== countLabel) countElement.textContent = countLabel;
   }
+
+  document.addEventListener(
+    "click",
+    (event) => {
+      const dialog = mediaDialog(event.target);
+      if (!dialog || !isEditorMediaPicker(dialog) || !dialog.querySelector(`.${organizerClass}`)) return;
+      const { entries } = findMediaEntries(dialog);
+      const target = event.target instanceof Element ? event.target : null;
+      const entry = entries.find(({ card }) => target && card.contains(target));
+      if (!entry || entry.name === ".gitkeep") return;
+      if (replayingPickerClicks.has(entry.card)) {
+        replayingPickerClicks.delete(entry.card);
+        return;
+      }
+
+      // Decap resolves a virtualized card from its native coordinates. Replay the
+      // same card click at those coordinates so sorting never changes the asset.
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      restoreNativePositions(entries);
+      replayingPickerClicks.add(entry.card);
+      entry.card.click();
+      window.setTimeout(() => organizeDialog(dialog), 50);
+    },
+    true,
+  );
 
   function scan() {
     scanScheduled = false;
