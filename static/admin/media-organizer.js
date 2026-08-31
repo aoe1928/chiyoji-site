@@ -52,19 +52,24 @@
 
   function findMediaEntries(dialog) {
     const labels = Array.from(dialog.querySelectorAll("p"))
-      .map((label) => ({ label, name: compactText(label), card: label.parentElement }))
-      .filter(({ name, card }) => card && (IMAGE_NAME.test(name) || name === ".gitkeep"));
+      .map((label) => ({
+        label,
+        name: compactText(label),
+        card: label.parentElement,
+        wrapper: label.parentElement?.parentElement,
+      }))
+      .filter(({ name, card, wrapper }) => card && wrapper && (IMAGE_NAME.test(name) || name === ".gitkeep"));
 
     if (!labels.length) return { grid: null, entries: [] };
 
     const parentCounts = new Map();
-    for (const { card } of labels) {
-      const parent = card.parentElement;
+    for (const { wrapper } of labels) {
+      const parent = wrapper.parentElement;
       if (parent) parentCounts.set(parent, (parentCounts.get(parent) || 0) + 1);
     }
     const grid = Array.from(parentCounts).sort((left, right) => right[1] - left[1])[0]?.[0] || null;
     const entries = labels
-      .filter(({ card }) => card.parentElement === grid)
+      .filter(({ wrapper }) => wrapper.parentElement === grid)
       .map((entry) => ({
         ...entry,
         date: dateFromName(entry.name),
@@ -105,6 +110,9 @@
         background: "#f7faf9",
         color: "#253238",
         font: "600 13px/1.4 system-ui, sans-serif",
+        position: "sticky",
+        top: "0",
+        zIndex: "5",
       });
       const controlStyle = "display:flex;align-items:center;gap:7px";
       toolbar.innerHTML = `
@@ -199,12 +207,31 @@
     if (badge.textContent !== date.label) badge.textContent = date.label;
   }
 
-  function setCardVisible(card, visible) {
-    if (card.dataset.chiyojiOriginalDisplay === undefined) {
-      card.dataset.chiyojiOriginalDisplay = card.style.display || "";
+  function setEntryVisible(entry, visible) {
+    const element = entry.wrapper;
+    if (element.dataset.chiyojiOriginalDisplay === undefined) {
+      element.dataset.chiyojiOriginalDisplay = element.style.display || "";
     }
-    card.hidden = !visible;
-    card.style.display = visible ? card.dataset.chiyojiOriginalDisplay : "none";
+    element.hidden = !visible;
+    element.style.display = visible ? element.dataset.chiyojiOriginalDisplay : "none";
+  }
+
+  function positionEntries(entries, sortedVisible) {
+    const slots = entries
+      .map(({ wrapper }) => ({
+        left: wrapper.style.left,
+        top: wrapper.style.top,
+        leftNumber: Number.parseFloat(wrapper.style.left) || 0,
+        topNumber: Number.parseFloat(wrapper.style.top) || 0,
+      }))
+      .sort((left, right) => left.topNumber - right.topNumber || left.leftNumber - right.leftNumber);
+
+    sortedVisible.forEach((entry, index) => {
+      const slot = slots[index];
+      if (!slot) return;
+      entry.wrapper.style.left = slot.left;
+      entry.wrapper.style.top = slot.top;
+    });
   }
 
   function organizeDialog(dialog) {
@@ -229,26 +256,25 @@
     const selectedDate = dialog.dataset.chiyojiMediaDate || "all";
     const selectedType = dialog.dataset.chiyojiMediaType || "all";
     const sorted = sortEntries(datedEntries, selectedSort);
-    const orderByCard = new Map(sorted.map((entry, index) => [entry.card, index]));
+    const visibleEntries = sorted.filter(({ date, fileType }) => (
+      (selectedDate === "all" || date.key === selectedDate) &&
+      (selectedType === "all" || fileType.key === selectedType)
+    ));
+    positionEntries(entries, visibleEntries);
+    const visibleCards = new Set(visibleEntries.map(({ card }) => card));
 
     for (const entry of entries) {
       if (entry.name === ".gitkeep") {
-        setCardVisible(entry.card, false);
+        setEntryVisible(entry, false);
         continue;
       }
       entry.card.style.position = "relative";
-      entry.card.style.order = String(orderByCard.get(entry.card));
-      setCardVisible(entry.card, !(
-        (selectedDate !== "all" && entry.date.key !== selectedDate) ||
-        (selectedType !== "all" && entry.fileType.key !== selectedType)
-      ));
+      entry.card.style.removeProperty("order");
+      setEntryVisible(entry, visibleCards.has(entry.card));
       addDateBadge(entry.card, entry.date);
     }
 
-    const visibleCount = sorted.filter(({ date, fileType }) => (
-      (selectedDate === "all" || date.key === selectedDate) &&
-      (selectedType === "all" || fileType.key === selectedType)
-    )).length;
+    const visibleCount = visibleEntries.length;
     const countLabel = `${visibleCount}/${sorted.length}枚・${SORT_LABELS[selectedSort]}`;
     const countElement = toolbar.querySelector("[data-count]");
     if (countElement.textContent !== countLabel) countElement.textContent = countLabel;
