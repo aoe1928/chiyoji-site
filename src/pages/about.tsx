@@ -50,6 +50,13 @@ const AboutPage: React.FC = () => {
     'KYairi アコギ',
   ];
 
+  const cameras = [
+    'Sony α ZV-E10',
+    'DJI Osmo Action 4',
+    'SIGMA 18-50mm F2.8 DC DN',
+    'TTArtisan 25mm f/2 C APS-C',
+  ];
+
   const pcSpecs = [
     'AMD Ryzen 9 5950X',
     'ASUS ROG Crosshair VIII Dark Hero',
@@ -187,6 +194,38 @@ const AboutPage: React.FC = () => {
               </Typography>
               <Box component="ul" sx={{ m: 0, p: 0, listStyle: 'none' }}>
                 {instruments.map((item) => (
+                  <Box
+                    component="li"
+                    key={item}
+                    sx={{
+                      color: 'rgba(255, 255, 255, 0.85)',
+                      fontSize: '0.92rem',
+                      lineHeight: 1.8,
+                    }}
+                  >
+                    {item}
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+
+            {/* カメラ */}
+            <Box>
+              <Typography
+                component="h3"
+                sx={{
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'rgba(255, 255, 255, 0.45)',
+                  mb: 1,
+                }}
+              >
+                {isEnglish ? 'Camera' : 'Camera / カメラ'}
+              </Typography>
+              <Box component="ul" sx={{ m: 0, p: 0, listStyle: 'none' }}>
+                {cameras.map((item) => (
                   <Box
                     component="li"
                     key={item}
