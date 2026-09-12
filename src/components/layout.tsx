@@ -31,7 +31,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { language } = useI18next();
   const isEnglish = language === 'en';
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -99,6 +99,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               >
                 <MenuItem sx={{ color: '#FFB6C1' }} onClick={handleMenuClose} component={Link} language={language} to="/music-activity">{isEnglish ? 'Music Activity' : '音楽活動'}</MenuItem>
                 <MenuItem sx={{ color: '#FFB6C1' }} onClick={handleMenuClose} component={Link} language={language} to="/blog">{isEnglish ? 'Blog' : 'ブログ'}</MenuItem>
+                <MenuItem sx={{ color: '#FFB6C1' }} onClick={handleMenuClose} component={Link} language={language} to="/apps/">{isEnglish ? 'Apps' : 'アプリ'}</MenuItem>
                 <MenuItem sx={{ color: '#FFB6C1' }} onClick={handleMenuClose} component={Link} language={language} to="/links">{isEnglish ? 'Links' : 'リンク'}</MenuItem>
                 <MenuItem sx={{ color: '#FFB6C1' }} onClick={handleMenuClose} component={Link} language={language} to="/about">{isEnglish ? 'About' : '自己紹介'}</MenuItem>
               </Menu>
@@ -107,6 +108,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <>
               <StyledLink language={language} to="/music-activity">{isEnglish ? 'Music Activity' : '音楽活動'}</StyledLink>
               <StyledLink language={language} to="/blog">{isEnglish ? 'Blog' : 'ブログ'}</StyledLink>
+              <StyledLink language={language} to="/apps/">{isEnglish ? 'Apps' : 'アプリ'}</StyledLink>
               <StyledLink language={language} to="/links">{isEnglish ? 'Links' : 'リンク'}</StyledLink>
               <StyledLink language={language} to="/about">{isEnglish ? 'About' : '自己紹介'}</StyledLink>
             </>
