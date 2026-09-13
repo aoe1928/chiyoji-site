@@ -106,6 +106,11 @@ const SongIntroductionPage: React.FC = () => {
             </Box>
           ))}
 
+          <Box mt={2}>
+            <StyledSongLink to="/second-waltz/songs/yume-wa-kanawanai">
+              夢は叶わない
+            </StyledSongLink>
+          </Box>
           {/* Purgatorio */}
           <Typography id="purgatorio-section" variant="h2" gutterBottom sx={{ mt: 9, fontSize: { xs: '2rem', sm: '2.5rem' } }}>
             Purgatorio
