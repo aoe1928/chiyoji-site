@@ -108,6 +108,7 @@ const SongIntroductionPage: React.FC = () => {
 
           <Box mt={2}>
             <StyledSongLink to="/second-waltz/songs/yume-wa-kanawanai">
+              <AlbumArt src={telepathGirlArt} alt="夢は叶わない" />
               夢は叶わない
             </StyledSongLink>
           </Box>
