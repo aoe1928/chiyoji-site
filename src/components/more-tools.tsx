@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
 
-const tools = [
+export const tools = [
   {
     id: 'note-catcher', name: 'Note Catcher', platform: 'Ableton Live / Max for Live',
     title: ['欲しいMIDIノートだけ、欲しい音へ。', 'Pick your notes. Remap each pitch.'],
@@ -43,17 +43,11 @@ const tools = [
   },
 ];
 
-export const ToolNavigation = () => (
-  <Box component="nav" aria-label="Apps" sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 4 }}>
-    {[{ id: 'explorer-merge', name: 'Explorer Merge' }, ...tools].map(tool => <Button key={tool.id} component="a" href={`#${tool.id}`} variant="outlined" sx={{ textTransform: 'none' }}>{tool.name}</Button>)}
-  </Box>
-);
-
-export default function MoreTools({ en }: { en: boolean }) {
+export default function MoreTools({ en, id }: { en: boolean; id: string }) {
   const lang = en ? 1 : 0;
-  return <>{tools.map(tool => <Box component="article" id={tool.id} key={tool.id} sx={{ scrollMarginTop: 24, mt: 7, pt: 5, borderTop: '1px solid rgba(102,255,102,0.35)' }}>
+  return <>{tools.filter(tool => tool.id === id).map(tool => <Box component="article" id={tool.id} key={tool.id} sx={{ scrollMarginTop: 24, mt: 2 }}>
     <Chip label={tool.platform} size="small" sx={{ color: '#b9ffbd', bgcolor: 'rgba(102,255,102,0.07)', mb: 2 }} />
-    <Typography component="h2" sx={{ fontSize: 'clamp(1.8rem, 5vw, 2.6rem)', fontWeight: 850 }}>{tool.name}</Typography>
+    <Typography component="h1" sx={{ fontSize: 'clamp(1.8rem, 5vw, 2.6rem)', fontWeight: 850 }}>{tool.name}</Typography>
     <Typography sx={{ color: '#ffb6c1', fontSize: '1.2rem', fontWeight: 700, mt: 1, mb: 2 }}>{tool.title[lang]}</Typography>
     <Typography sx={{ lineHeight: 1.9 }}>{tool.text[lang]}</Typography>
     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3, mt: 3 }}>

@@ -21,3 +21,5 @@ The current publishing workflow runs when `codex/decap-cms-trial` is pushed and 
 ## License
 
 The existing Gatsby-derived 0BSD LICENSE is retained. Listed tools follow their own repository licenses. Images, character artwork, icons and logos are handled separately from code licenses; inclusion on this site does not grant redistribution rights.
+
+Each app has its own `/apps/<app-id>/` detail page (and `/en/apps/<app-id>/` in English). The app index shows summaries only. Detail pages retain setup, downloads and compatibility notes.
