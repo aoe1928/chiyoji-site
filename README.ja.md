@@ -34,6 +34,8 @@ npm run deploy
 
 公開先のパスは `gatsby-config.js` の `pathPrefix` で設定しています。
 
+現在は `codex/decap-cms-trial` へのプッシュでも自動ビルドが実行され、`gh-pages` に公開されます。公開先は https://www.aoe1928.com です。`DEPLOY_CHEATSHEET.md` のmainブランチの例は、現在のCMS自動公開フローより前の記述です。公開前に変更内容を確認してください。
+
 ## アプリ紹介
 
 /apps/ と /en/apps/ に5つのツールを掲載。紹介文は src/pages/apps.tsx と src/components/more-tools.tsx で管理します。掲載は各ツールの全環境での動作保証を意味しません。
