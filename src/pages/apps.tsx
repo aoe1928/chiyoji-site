@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography';
 import DownloadIcon from '@mui/icons-material/Download';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import Layout from '../components/layout';
+import MoreTools, { ToolNavigation } from '../components/more-tools';
 
 const repository = 'https://github.com/aoe1928/explorer-merge';
 const download = `${repository}/releases/latest`;
@@ -40,7 +41,7 @@ const AppsPage: React.FC = () => {
     <Layout>
       <Helmet>
         <title>{en ? "Apps | Chiyoji's Website" : 'つくったアプリ | ちよじのホームページ'}</title>
-        <meta name="description" content={en ? 'Small apps by Chiyoji. Explorer Merge combines Windows 11 File Explorer windows into native tabs. Free, open source and no installation needed.' : 'ちよじが作ったアプリの紹介。Windows 11のエクスプローラーを1クリックでまとめる、無料・常駐不要のExplorer Mergeを公開しています。'} />
+        <meta name="description" content={en ? 'Tools by Chiyoji: Explorer Merge, Note Catcher, Live Bridge, py-img-tool and safe_eject. Downloads, setup guides and compatibility notes.' : 'ちよじが作ったExplorer Merge、Note Catcher、Live Bridge、py-img-tool、safe_ejectの紹介。ダウンロード・導入手順・対応環境をまとめています。'} />
       </Helmet>
       <Box sx={{ maxWidth: 1040, mx: 'auto', py: { xs: 2, md: 5 } }}>
         <Typography component="h1" sx={{ fontSize: 'clamp(2rem, 6vw, 3.4rem)', fontWeight: 900, letterSpacing: '-0.03em', background: 'linear-gradient(110deg, #66ff66 10%, #9cffaa 55%, #ffb6c1 100%)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
@@ -49,6 +50,7 @@ const AppsPage: React.FC = () => {
         <Typography sx={{ ...bodyStyle, mt: 1.5, mb: { xs: 4, md: 6 } }}>
           {en ? 'Small tools for the little things that get in the way.' : '日々の「ちょっと不便」を、少し楽にする道具。'}
         </Typography>
+        <ToolNavigation />
 
         <Box component="article" id="explorer-merge" sx={{ scrollMarginTop: 24, borderTop: '1px solid rgba(102,255,102,0.35)', pt: { xs: 4, md: 5 } }}>
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '220px minmax(0,1fr)' }, gap: { xs: 2, md: 5 }, alignItems: 'center' }}>
@@ -106,6 +108,7 @@ const AppsPage: React.FC = () => {
             </Box>
           </Box>
         </Box>
+        <MoreTools en={en} />
       </Box>
     </Layout>
   );

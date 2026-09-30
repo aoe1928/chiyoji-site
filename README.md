@@ -1,33 +1,23 @@
-# ちよじのホームページ
+English | [日本語](README.ja.md)
 
-Gatsby 5で作成した個人サイトです。
+# Chiyoji's Website
 
-## 必要なもの
+A personal website built with Gatsby 5, with Japanese and English pages.
 
-- Node.js 20
-- npm
+## Development
 
-## ローカルで見る
+Requires Node.js 20 and npm. Run `npm install`, then `npm start` and open http://localhost:8000.
 
-```sh
-npm install
-npm start
-```
+## Build and publish
 
-ブラウザで <http://localhost:8000> を開きます。編集内容は自動的に反映されます。
+`npm run build` generates the production site in `public/` without publishing it.
 
-## 本番用ファイルを作る
+The current publishing workflow runs when `codex/decap-cms-trial` is pushed and publishes the generated site to `gh-pages`. `npm run deploy` also builds and publishes directly. The public site is https://www.aoe1928.com. Review changes before publishing; see DEPLOY_CHEATSHEET.md for background (its main-branch examples predate the current CMS workflow).
 
-```sh
-npm run build
-```
+## App listings
 
-生成結果は `public/` に出力されます。
+`/apps/` and `/en/apps/` introduce Explorer Merge, Note Catcher, Live Bridge, py-img-tool and safe_eject. Edit `src/pages/apps.tsx` and `src/components/more-tools.tsx`. Listings include setup links and known verification limits; they do not imply compatibility with every environment.
 
-## GitHub Pagesへ公開する
+## License
 
-```sh
-npm run deploy
-```
-
-公開先のパスは `gatsby-config.js` の `pathPrefix` で設定しています。
+The existing Gatsby-derived 0BSD LICENSE is retained. Listed tools follow their own repository licenses. Images, character artwork, icons and logos are handled separately from code licenses; inclusion on this site does not grant redistribution rights.
