@@ -6,6 +6,15 @@ import Typography from '@mui/material/Typography';
 
 export const tools = [
   {
+    id: 'live-memo', name: 'Live Memo', platform: 'Ableton Live / Max for Live',
+    title: ['Liveの中に、メモをひとつ。', 'A small memo inside Live.'],
+    text: ['デバイス欄に置いて直接書き込める、メモ欄だけのMax for Liveデバイス。制作中のアイデアや次に直すことを、曲のそばに残すための試作です。', 'A minimal Max for Live device with an editable memo in the device panel. A prototype for keeping ideas and revision notes next to your music.'],
+    setup: ['Live Suite、またはStandard＋Max for Liveが必要です。ZIPを展開し、Live Memo.amxdを音声エフェクト欄へドラッグ。MIDIトラックでは音源の後ろに置きます。入力後はTabか欄の外のクリックで編集を終え、Liveセットを保存します。', 'Requires Live Suite or Standard with Max for Live. Extract the ZIP and drag Live Memo.amxd into the audio effect chain, after the instrument on MIDI tracks. Finish editing with Tab or a click outside the field, then save the Live Set.'],
+    limits: ['v0.1.0は試作版。改行・折り返し、セット内保存用の設定、ステレオ音声直結を実装しています。ファイル構造と設定のみ確認済みで、Windows・Macとも読込、日本語入力、スクロール、音声再生、保存後の復元は実機未検証。Macではフォントが変わる可能性があります。', 'Version 0.1.0 is a prototype with multiline text, wrapping, Set-storage configuration and direct stereo pass-through. Only file structure and configuration have been checked. Loading, Japanese input, scrolling, playback and saved-Set restoration are unverified on Windows and Mac. Font appearance may differ on Mac.'],
+    href: 'https://github.com/aoe1928/live-memo/releases/tag/v0.1.0', repo: 'https://github.com/aoe1928/live-memo', download: true,
+    license: ['コード・文書はMIT。画像・キャラクター・アイコン・ロゴ等の素材は対象外。本配布にそのような素材は含みません。', 'Code and documentation: MIT. Images, characters, icons and logos are excluded; no such assets are bundled.'],
+  },
+  {
     id: 'note-catcher', name: 'Note Catcher', platform: 'Ableton Live / Max for Live',
     title: ['欲しいMIDIノートだけ、欲しい音へ。', 'Pick your notes. Remap each pitch.'],
     text: ['別トラックのMIDIノートを受け取り、音ごとに変換するMax for Liveデバイス。オクターブ別の12音グリッドで複数選択し、C0→C1、D0→E1のように割り当てられます。', 'Receive MIDI notes from another track and remap each pitch with this Max for Live device. Select notes across an octave grid and assign mappings such as C0 to C1 and D0 to E1.'],

@@ -38,7 +38,7 @@ npm run deploy
 
 ## アプリ紹介
 
-/apps/ と /en/apps/ に5つのツールを掲載。紹介文は src/pages/apps.tsx と src/components/more-tools.tsx で管理します。掲載は各ツールの全環境での動作保証を意味しません。
+/apps/ と /en/apps/ に6つのツールを掲載。紹介文は src/pages/apps.tsx と src/components/more-tools.tsx で管理します。掲載は各ツールの全環境での動作保証を意味しません。Live Memo 0.1.0はWindows・Macとも実機未検証の試作として掲載しています。
 
 ## ライセンス
 

@@ -14,7 +14,7 @@ export default function AppsPage() {
   const { language } = useI18next();
   const en = language === 'en';
   return <Layout>
-    <Helmet><title>{en ? "Apps | Chiyoji's Website" : 'つくったアプリ | ちよじのホームページ'}</title><meta name="description" content={en ? 'Explore five tools by Chiyoji for Windows, music production, images and macOS.' : 'Windows、音楽制作、画像変換、Mac向けに作った5つのツールを紹介。各アプリの詳しい使い方と配布先はこちら。'} /></Helmet>
+    <Helmet><title>{en ? "Apps | Chiyoji's Website" : 'つくったアプリ | ちよじのホームページ'}</title><meta name="description" content={en ? 'Explore six tools by Chiyoji for Windows, music production, images and macOS.' : 'Windows、音楽制作、画像変換、Mac向けに作った6つのツールを紹介。各アプリの詳しい使い方と配布先はこちら。'} /></Helmet>
     <Box sx={{ maxWidth: 1040, mx: 'auto', py: { xs: 2, md: 5 } }}>
       <Typography component="h1" sx={{ fontSize: 'clamp(2rem, 6vw, 3.4rem)', fontWeight: 900, color: '#9cffaa' }}>{en ? 'Apps I made' : 'つくったアプリ'}</Typography>
       <Typography sx={{ mt: 1.5, mb: 4, lineHeight: 1.9 }}>{en ? 'Small tools for the little things that get in the way.' : '日々の「ちょっと不便」を、少し楽にする道具。'}</Typography>

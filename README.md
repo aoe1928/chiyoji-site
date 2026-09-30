@@ -16,7 +16,7 @@ The current publishing workflow runs when `codex/decap-cms-trial` is pushed and 
 
 ## App listings
 
-`/apps/` and `/en/apps/` introduce Explorer Merge, Note Catcher, Live Bridge, py-img-tool and safe_eject. Edit `src/pages/apps.tsx` and `src/components/more-tools.tsx`. Listings include setup links and known verification limits; they do not imply compatibility with every environment.
+`/apps/` and `/en/apps/` introduce Explorer Merge, Live Memo, Note Catcher, Live Bridge, py-img-tool and safe_eject. Edit `src/pages/apps.tsx` and `src/components/more-tools.tsx`. Listings include setup links and known verification limits; they do not imply compatibility with every environment. Live Memo 0.1.0 is listed as a prototype with no runtime verification on either Windows or Mac.
 
 ## License
 
