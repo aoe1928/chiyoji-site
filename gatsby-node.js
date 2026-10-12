@@ -33,6 +33,7 @@ exports.onCreateDevServer = ({ app }) => {
 exports.createSchemaCustomization = ({ actions }) => {
   actions.createTypes(`
     type MdxFrontmatter {
+      layout: String
       draft: Boolean
       lang: String
       slug: String
@@ -89,6 +90,7 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
             frontmatter {
               title
               date(formatString: "YYYY-MM-DD")
+              layout
               draft
               lang
               categories
@@ -116,6 +118,7 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
     ? allPosts
     : allPosts.filter(({ node }) => node.frontmatter.draft !== true);
   const postTemplate = path.resolve('./src/templates/post-template.tsx');
+  const photoEssayTemplate = path.resolve('./src/templates/photo-essay-template.tsx');
   const draftPreviewIndexTemplate = path.resolve('./src/templates/draft-preview-index-template.tsx');
   const archiveTemplate = path.resolve('./src/templates/monthly-archive-template.tsx');
   const blogListTemplate = path.resolve('./src/templates/blog-list-template.tsx');
@@ -130,7 +133,7 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
   posts.forEach(({ node }) => {
     actions.createPage({
       path: node.fields.slug,
-      component: postTemplate,
+      component: node.frontmatter.layout === 'photo-essay' ? photoEssayTemplate : postTemplate,
       context: { id: node.id, slug: node.fields.slug },
     });
   });
@@ -141,7 +144,7 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
   draftPosts.forEach(({ node }) => {
     actions.createPage({
       path: `/preview/${node.fields.previewSlug}`,
-      component: postTemplate,
+      component: node.frontmatter.layout === 'photo-essay' ? photoEssayTemplate : postTemplate,
       context: {
         id: node.id,
         slug: node.fields.slug,

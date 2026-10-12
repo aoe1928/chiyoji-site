@@ -1,0 +1,564 @@
+import React from 'react';
+import { graphql } from 'gatsby';
+import { Link, useI18next } from 'gatsby-plugin-react-i18next';
+import { MDXProvider } from '@mdx-js/react';
+import Layout from '../components/layout';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import Box from '@mui/material/Box';
+import MDXComponents from '../components/MDXComponents';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import TwitterIcon from '@mui/icons-material/Twitter';
+import InstagramIcon from '@mui/icons-material/Instagram';
+import MailIcon from '@mui/icons-material/Mail';
+import YouTubeIcon from '@mui/icons-material/YouTube';
+import LinkIcon from '@mui/icons-material/Link';
+import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
+import { makeStyles } from '@mui/styles';
+import CategoryTrail from '../components/category-trail';
+import DraftPreviewGate from '../components/draft-preview-gate';
+
+type Props = {
+  data: {
+    allMdx: {
+      nodes: Array<{
+        id: string;
+      frontmatter: {
+        title: string;
+        description?: string;
+        socialImage?: string;
+        date: string;
+          photo: string[];
+          lang?: string;
+          categories?: string[];
+      };
+      body: string;
+      fields: {
+        slug: string;
+      };
+      }>;
+    };
+  };
+  pageContext?: {
+    draftPreview?: boolean;
+  };
+};
+
+const useStyles = makeStyles({
+  shareButton: {
+    margin: '0 8px',
+  },
+});
+
+const normalizeArticleImageSrc = (src: string) => {
+  if (!src) return '';
+  if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('data:')) {
+    return src;
+  }
+  const normalized = src.replace(/\\/g, '/');
+  const match = normalized.match(/^(?:\/)?static\/images\/blog\/(.+)$/i);
+  if (match) return `/images/blog/${match[1]}`;
+  if (normalized.startsWith('/images/blog/')) return normalized;
+  if (normalized.startsWith('images/blog/')) return `/${normalized}`;
+  if (!normalized.startsWith('/')) {
+    return `/images/blog/${normalized}`;
+  }
+  return normalized;
+};
+
+type CodeBlockProps = {
+  children?: React.ReactNode;
+};
+
+const CODE_LANGUAGE_LABELS: Record<string, string> = {
+  text: 'TEXT',
+  txt: 'TEXT',
+  powershell: 'POWERSHELL',
+  ps1: 'POWERSHELL',
+  bash: 'BASH',
+  shell: 'SHELL',
+  json: 'JSON',
+};
+
+const CodeBlock: React.FC<CodeBlockProps> = ({ children }) => {
+  const [copied, setCopied] = React.useState(false);
+  const codeElement = React.isValidElement<{ className?: string; children?: React.ReactNode }>(children)
+    ? children
+    : null;
+  const className = String(codeElement?.props?.className || '');
+  const language = className.match(/language-([\w-]+)/)?.[1]?.toLowerCase() || 'text';
+  const label = CODE_LANGUAGE_LABELS[language] || language.toUpperCase();
+  const code = String(codeElement?.props?.children ?? children ?? '').replace(/\n$/, '');
+
+  const copyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      const textarea = document.createElement('textarea');
+      textarea.value = code;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      textarea.remove();
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    }
+  };
+
+  return (
+    <Box
+      component="figure"
+      sx={{
+        maxWidth: '920px',
+        mx: 'auto',
+        my: { xs: 3, sm: 4 },
+        overflow: 'hidden',
+        border: '1px solid rgba(181, 255, 189, 0.22)',
+        borderRadius: { xs: '12px', sm: '16px' },
+        backgroundColor: '#090d0a',
+        boxShadow: '0 16px 38px rgba(0, 0, 0, 0.28)',
+      }}
+    >
+      <Box
+        component="figcaption"
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          minHeight: '44px',
+          px: { xs: 1.5, sm: 2 },
+          borderBottom: '1px solid rgba(181, 255, 189, 0.14)',
+          backgroundColor: 'rgba(181, 255, 189, 0.055)',
+        }}
+      >
+        <Typography
+          component="span"
+          sx={{
+            color: '#b5ffbd',
+            fontFamily: 'monospace',
+            fontSize: '0.72rem',
+            fontWeight: 800,
+            letterSpacing: '0.12em',
+          }}
+        >
+          {label}
+        </Typography>
+        <Box
+          component="button"
+          type="button"
+          onClick={copyCode}
+          aria-label={copied ? 'コピーしました' : 'コードをコピー'}
+          sx={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 0.65,
+            minHeight: '32px',
+            px: 1.25,
+            border: '1px solid rgba(255, 255, 255, 0.16)',
+            borderRadius: '8px',
+            color: copied ? '#b5ffbd' : '#f7fff7',
+            backgroundColor: copied ? 'rgba(102, 255, 102, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+            cursor: 'pointer',
+            font: 'inherit',
+            fontSize: '0.78rem',
+            fontWeight: 700,
+            transition: 'border-color 160ms ease, background-color 160ms ease',
+            '&:hover': {
+              borderColor: 'rgba(181, 255, 189, 0.5)',
+              backgroundColor: 'rgba(181, 255, 189, 0.1)',
+            },
+            '&:focus-visible': {
+              outline: '2px solid #ffb6c1',
+              outlineOffset: '2px',
+            },
+          }}
+        >
+          {copied ? <CheckRoundedIcon sx={{ fontSize: 17 }} /> : <ContentCopyRoundedIcon sx={{ fontSize: 16 }} />}
+          {copied ? 'コピーしました' : 'コピー'}
+        </Box>
+      </Box>
+      <Box
+        component="pre"
+        tabIndex={0}
+        sx={{
+          m: 0,
+          p: { xs: 2, sm: 2.5 },
+          overflowX: 'auto',
+          color: '#f2f7f2',
+          fontFamily: '"Cascadia Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace',
+          fontSize: { xs: '0.8rem', sm: '0.9rem' },
+          fontWeight: 500,
+          lineHeight: 1.75,
+          tabSize: 2,
+          whiteSpace: 'pre',
+          scrollbarColor: 'rgba(181, 255, 189, 0.5) transparent',
+          '&:focus-visible': {
+            outline: '2px solid #ffb6c1',
+            outlineOffset: '-3px',
+          },
+          '& code': {
+            color: 'inherit',
+            font: 'inherit',
+          },
+        }}
+      >
+        <code className={className}>{code}</code>
+      </Box>
+    </Box>
+  );
+};
+
+const InlineCode = ({ children }) => (
+  <Box
+    component="code"
+    sx={{
+      display: 'inline',
+      px: 0.65,
+      py: 0.2,
+      border: '1px solid rgba(181, 255, 189, 0.18)',
+      borderRadius: '5px',
+      color: '#b5ffbd',
+      backgroundColor: 'rgba(181, 255, 189, 0.075)',
+      fontFamily: '"Cascadia Code", Consolas, monospace',
+      fontSize: '0.88em',
+      overflowWrap: 'anywhere',
+    }}
+  >
+    {children}
+  </Box>
+);
+
+const PostTemplate: React.FC<Props> = ({ data, pageContext }) => {
+    const { language } = useI18next();
+    const localizedPost = data.allMdx.nodes.find(({ frontmatter }) =>
+      language === 'en' ? frontmatter.lang === 'en' : frontmatter.lang !== 'en'
+    ) || data.allMdx.nodes[0];
+    const basePost = data.allMdx.nodes.find(({ frontmatter }) => frontmatter.lang !== 'en')
+      || localizedPost;
+    const { frontmatter, body, fields } = localizedPost;
+    const categories = basePost.frontmatter.categories;
+    //   const url = `${process.env.GATSBY_SITE_URL}${fields.slug}`;
+    const url = `https://www.aoe1928.com${language === 'en' ? '/en' : ''}${fields.slug}`;
+    const title = frontmatter.title;
+    const encodedArticleUrl = encodeURI(url);
+    const twitterShareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(encodedArticleUrl)}&text=${encodeURIComponent(title)}`;
+    const instagramShareUrl = `https://www.instagram.com/?url=${encodeURIComponent(encodedArticleUrl)}`;
+  // const photo = frontmatter.photo;
+  const { photo } = frontmatter;
+    const classes = useStyles();
+
+    type FullWidthImageProps = {
+      src: string;
+      alt?: string;
+      title?: string;
+    };
+
+    const ArticleImage: React.FC<FullWidthImageProps> = ({ src, alt, title }) => {
+      const imageSrc = normalizeArticleImageSrc(src);
+      return (
+      <Box
+        component="span"
+        sx={{
+          display: 'block',
+          width: '100%',
+          maxWidth: '760px',
+          my: { xs: 3, sm: 4 },
+          mx: 0,
+          textAlign: 'left',
+        }}
+      >
+        <Box
+          component="a"
+          href={imageSrc}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={alt ? `${alt}（原寸画像を開く）` : '原寸画像を開く'}
+          sx={{
+            display: 'block',
+            p: 0,
+            width: 'fit-content',
+            maxWidth: '100%',
+            borderRadius: '8px',
+            border: '1px solid rgba(255, 182, 193, 0.32)',
+            backgroundColor: 'rgba(255, 255, 255, 0.035)',
+            boxShadow: '0 14px 36px rgba(0, 0, 0, 0.35)',
+            lineHeight: 0,
+            transition: 'transform 180ms ease, box-shadow 180ms ease',
+            '&:hover': {
+              transform: 'translateY(-2px)',
+              boxShadow: '0 18px 42px rgba(0, 0, 0, 0.45)',
+            },
+            '&:focus-visible': {
+              outline: '2px solid #FFB6C1',
+              outlineOffset: '4px',
+            },
+          }}
+        >
+          <Box
+            component="img"
+            src={imageSrc}
+            alt={alt || title || ''}
+            title={title}
+            loading="lazy"
+            sx={{
+              display: 'block',
+              width: 'auto',
+              maxWidth: '100%',
+              maxHeight: { xs: '68vh', sm: '72vh' },
+              height: 'auto',
+              mx: 0,
+              borderRadius: '7px',
+              objectFit: 'contain',
+            }}
+          />
+        </Box>
+        {title && (
+          <Typography
+            component="span"
+            variant="caption"
+            sx={{ display: 'block', mt: 1.25, color: 'text.secondary', lineHeight: 1.5 }}
+          >
+            {title}
+          </Typography>
+        )}
+      </Box>
+      );
+    };
+
+    const FullWidthImage: React.FC<FullWidthImageProps> = ({ src, alt, title }) => (
+      <ArticleImage src={src} alt={alt} title={title} />
+    );
+
+    const handleCopyToClipboard = () => {
+        navigator.clipboard.writeText(url).then(() => {
+            alert(language === 'en' ? 'URL copied to clipboard' : 'URLがクリップボードにコピーされました');
+        });
+    };
+
+    const LinkRenderer = ({ href, children }) => {
+      const linkStyle = { color: '#66ff66' };
+      // 外部リンクの場合は新しいタブで開く
+      if (href.startsWith('http')) {
+        return <a href={href} target="_blank" rel="noopener noreferrer" style={linkStyle}>{children}</a>;
+      }
+      // 内部リンクはGatsbyのLinkを使用
+      return <Link to={href} language={language} style={linkStyle}>{children}</Link>;
+    };
+
+    const ArticleH1 = ({ children }) => (
+      <Typography
+        component="h1"
+        sx={{
+          maxWidth: '920px',
+          mx: 0,
+          mt: { xs: 5, sm: 7 },
+          mb: { xs: 3, sm: 4 },
+          textAlign: 'left',
+          fontSize: 'clamp(1.9rem, 5vw, 3.5rem)',
+          fontWeight: 850,
+          lineHeight: 1.18,
+          letterSpacing: '-0.025em',
+          overflowWrap: 'anywhere',
+          textWrap: 'balance',
+          background: 'linear-gradient(110deg, #66ff66 15%, #b5ffbd 58%, #ffb6c1 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+        }}
+      >
+        {children}
+      </Typography>
+    );
+
+    const ArticleH2 = ({ children }) => (
+      <Typography
+        component="h2"
+        sx={{
+          maxWidth: '760px',
+          mx: 0,
+          mt: { xs: 6, sm: 8 },
+          mb: { xs: 3, sm: 4 },
+          px: 0,
+          textAlign: 'left',
+          color: '#f7fff7',
+          fontSize: 'clamp(1.4rem, 3vw, 2rem)',
+          fontWeight: 800,
+          lineHeight: 1.35,
+          letterSpacing: '0.01em',
+          textWrap: 'balance',
+          '&::after': {
+            content: '""',
+            display: 'block',
+            width: '72px',
+            height: '3px',
+            mx: 0,
+            mt: 1.5,
+            borderRadius: '999px',
+            background: 'linear-gradient(90deg, #66ff66, #ffb6c1)',
+          },
+        }}
+      >
+        {children}
+      </Typography>
+    );
+
+  const article = (
+    <Layout>
+      <Box display="flex" alignItems="center">
+        <Link to="/" language={language} style={{ textDecoration: 'none', color: 'inherit' }}>
+          <IconButton aria-label="戻る">
+            <ArrowBackIcon />
+            <Typography variant="button" display="block" gutterBottom>BACK</Typography>
+          </IconButton>
+        </Link>
+      </Box>
+      <Box component="header" sx={{ maxWidth: '980px', mx: 0, mb: { xs: 4, sm: 5 }, textAlign: 'left' }}>
+        <Typography
+          component="h1"
+          sx={{
+            maxWidth: '940px',
+            mx: 0,
+            mb: 2,
+            fontSize: 'clamp(2rem, 5.2vw, 4rem)',
+            fontWeight: 900,
+            lineHeight: 1.14,
+            letterSpacing: '-0.035em',
+            overflowWrap: 'anywhere',
+            textWrap: 'balance',
+            background: 'linear-gradient(110deg, #66ff66 10%, #9cffaa 58%, #ffb6c1 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}
+        >
+          {frontmatter.title}
+        </Typography>
+        <Typography variant="subtitle2" sx={{ color: 'text.secondary', letterSpacing: '0.08em' }}>
+          {frontmatter.date}
+        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+          <CategoryTrail categories={categories} />
+        </Box>
+      </Box>
+      <Box component="article" sx={{ textAlign: 'left', maxWidth: '860px', '& > p': { lineHeight: 1.9 }, '& h3': { mt: 4, mb: 2, lineHeight: 1.5 }, '& p': { overflowWrap: 'anywhere' } }}>
+      <MDXProvider components={MDXComponents}>
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          components={{
+            a: LinkRenderer,
+            img: ArticleImage,
+            h1: ArticleH1,
+            h2: ArticleH2,
+            pre: CodeBlock,
+            code: InlineCode,
+          }}
+        >
+          {body}
+        </ReactMarkdown>
+      </MDXProvider>
+      </Box>
+      {/* {photo && <FullWidthImage src={photo} alt='' />} */}
+      {photo && photo.length > 0 && photo.map((imgSrc, index) => (
+        <FullWidthImage key={index} src={imgSrc} alt={`image-${index}`} />
+      ))}
+      {!pageContext?.draftPreview && <Box mt={4} display="flex" justifyContent="flex-start">
+        <IconButton
+          className={classes.shareButton}
+          component="a"
+          href={twitterShareUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Share on Twitter"
+        >
+          <TwitterIcon />
+        </IconButton>
+        <IconButton
+          className={classes.shareButton}
+          component="a"
+          href={instagramShareUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Share on Instagram"
+        >
+          <InstagramIcon />
+        </IconButton>
+
+        <IconButton
+          className={classes.shareButton}
+          onClick={handleCopyToClipboard}
+          aria-label="Copy URL to clipboard"
+        >
+          <LinkIcon />
+        </IconButton>
+
+      </Box>}
+    </Layout>
+  );
+
+  return pageContext?.draftPreview
+    ? <DraftPreviewGate>{article}</DraftPreviewGate>
+    : article;
+};
+
+export const query = graphql`
+  query($slug: String!, $language: String!) {
+    allMdx(filter: { fields: { slug: { eq: $slug } } }) {
+      nodes {
+        id
+        frontmatter {
+          title
+          description
+          socialImage
+          date(formatString: "YYYY-MM-DD")
+          photo
+          lang
+          categories
+        }
+        body
+        fields {
+          slug
+        }
+      }
+    }
+    locales: allLocale(filter: { language: { eq: $language } }) {
+      edges {
+        node {
+          ns
+          data
+          language
+        }
+      }
+    }
+  }
+`;
+
+export default PostTemplate;
+
+export const Head = ({ data, pageContext }: Props) => {
+  const post = data.allMdx.nodes.find(node => node.frontmatter.lang !== 'en') || data.allMdx.nodes[0];
+  const { title, description, socialImage } = post.frontmatter;
+  const url = 'https://www.aoe1928.com' + post.fields.slug;
+  const image = socialImage ? new URL(socialImage, 'https://www.aoe1928.com').href : undefined;
+  return <>
+    <title>{title} | ちよじのホームページ</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={url} />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={url} />
+    {image && <meta property="og:image" content={image} />}
+    <meta name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {image && <meta name="twitter:image" content={image} />}
+    {pageContext?.draftPreview && <meta name="robots" content="noindex" />}
+  </>;
+};
