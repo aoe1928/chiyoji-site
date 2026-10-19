@@ -68,6 +68,19 @@ const SecondWaltz: React.FC = () => {
         {/* <StyledImage src="https://pub-01fefff4e3b240f089003a1627fe087d.r2.dev/IMG_0584.png" alt="Second Waltz" /> */}
         {/* <StyledImage src="https://pub-01fefff4e3b240f089003a1627fe087d.r2.dev/second_waltz_%E3%83%84%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88.jpg" alt="Second Waltz" /> */}
       </Content>
+      <Box component="section" mt={4}>
+        <Typography variant="h2" gutterBottom sx={{ color: '#E0BBE4' }}>
+          {isEnglish ? 'Live news' : 'ライブのお知らせ'}
+        </Typography>
+        <Typography paragraph sx={{ color: '#D1E8E2' }}>
+          {isEnglish
+            ? 'November 3, 2026 — Olympia tes Anatoles at Asagaya mogumogu. Doors 14:20 / Music 14:30.'
+            : '2026年11月3日（火）「オリュンピア・テース・アナトレース」阿佐ヶ谷mogumogu。開場14:20／開演14:30。'}
+        </Typography>
+        <GatsbyLink to="/blog/20261103-olympia-live/" language={language} style={{ color: '#FFB6C1' }}>
+          {isEnglish ? 'Event details and reservations →' : '公演の詳細・ご予約はこちら →'}
+        </GatsbyLink>
+      </Box>
       <Box mt={4}>
         <Typography
           variant="h2"
