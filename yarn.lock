@@ -1558,15 +1558,15 @@
   dependencies:
     "@lezer/common" "^1.0.0"
 
-"@lmdb/lmdb-darwin-arm64@2.5.2":
+"@lmdb/lmdb-win32-x64@2.5.2":
   version "2.5.2"
-  resolved "https://registry.npmjs.org/@lmdb/lmdb-darwin-arm64/-/lmdb-darwin-arm64-2.5.2.tgz"
-  integrity sha512-+F8ioQIUN68B4UFiIBYu0QQvgb9FmlKw2ctQMSBfW2QBrZIxz9vD9jCGqTCPqZBRbPHAS/vG1zSXnKqnS2ch/A==
+  resolved "https://registry.npmjs.org/@lmdb/lmdb-win32-x64/-/lmdb-win32-x64-2.5.2.tgz"
+  integrity sha512-zrBczSbXKxEyK2ijtbRdICDygRqWSRPpZMN5dD1T8VMEW5RIhIbwFWw2phDRXuBQdVDpSjalCIUMWMV2h3JaZA==
 
-"@lmdb/lmdb-darwin-arm64@2.5.3":
+"@lmdb/lmdb-win32-x64@2.5.3":
   version "2.5.3"
-  resolved "https://registry.npmjs.org/@lmdb/lmdb-darwin-arm64/-/lmdb-darwin-arm64-2.5.3.tgz"
-  integrity sha512-RXwGZ/0eCqtCY8FLTM/koR60w+MXyvBUpToXiIyjOcBnC81tAlTUHrRUavCEWPI9zc9VgvpK3+cbumPyR8BSuA==
+  resolved "https://registry.npmjs.org/@lmdb/lmdb-win32-x64/-/lmdb-win32-x64-2.5.3.tgz"
+  integrity sha512-cK+Elf3RjEzrm3SerAhrFWL5oQAsZSJ/LmjL1joIpTfEP1etJJ9CTRvdaV6XLYAxaEkfdhk/9hOvHLbR9yIhCA==
 
 "@mdx-js/mdx@^2.3.0":
   version "2.3.0"
@@ -1608,10 +1608,10 @@
     "@lezer/lr" "^1.0.0"
     json5 "^2.2.1"
 
-"@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.4":
+"@msgpackr-extract/msgpackr-extract-win32-x64@3.0.4":
   version "3.0.4"
-  resolved "https://registry.npmjs.org/@msgpackr-extract/msgpackr-extract-darwin-arm64/-/msgpackr-extract-darwin-arm64-3.0.4.tgz"
-  integrity sha512-LCkGo6JDfaBhgST7UpPWgNgLINpcpabaHfyz5OBx75nUYxBsaEPxjnyNjWpeb/xBup/682QnBfRBy2/LvPutZQ==
+  resolved "https://registry.npmjs.org/@msgpackr-extract/msgpackr-extract-win32-x64/-/msgpackr-extract-win32-x64-3.0.4.tgz"
+  integrity sha512-CmCXPQrkbwExx3j946/PtHWHbYJiCRBRDl4BlkRQcJB/YOwQxJRTpoo7aTsortjgoJ1x7opzTSxn7C+ASSLVjQ==
 
 "@mui/core-downloads-tracker@^5.18.0":
   version "5.18.0"
@@ -2026,10 +2026,10 @@
     "@parcel/source-map" "^2.1.1"
     chalk "^4.1.0"
 
-"@parcel/watcher-darwin-arm64@2.5.6":
+"@parcel/watcher-win32-x64@2.5.6":
   version "2.5.6"
-  resolved "https://registry.npmjs.org/@parcel/watcher-darwin-arm64/-/watcher-darwin-arm64-2.5.6.tgz"
-  integrity sha512-Z2ZdrnwyXvvvdtRHLmM4knydIdU9adO3D4n/0cVipF3rRiwP+3/sfzpAwA/qKFL6i1ModaabkU7IbpeMBgiVEA==
+  resolved "https://registry.npmjs.org/@parcel/watcher-win32-x64/-/watcher-win32-x64-2.5.6.tgz"
+  integrity sha512-hbQlYcCq5dlAX9Qx+kFb0FHue6vbjlf0FrNzSKdYK2APUf7tGfGxQCk2ihEREmbR6ZMc0MVAD5RIX/41gpUzTw==
 
 "@parcel/watcher@^2.0.7":
   version "2.5.6"
@@ -2581,10 +2581,10 @@
     "@typescript-eslint/types" "5.62.0"
     eslint-visitor-keys "^3.3.0"
 
-"@typescript/typescript-darwin-arm64@7.0.2":
+"@typescript/typescript-win32-x64@7.0.2":
   version "7.0.2"
-  resolved "https://registry.npmjs.org/@typescript/typescript-darwin-arm64/-/typescript-darwin-arm64-7.0.2.tgz"
-  integrity sha512-gowzar9MwS/aRWp6f3a4KUqzRjAZjOsmGNCM6LcTgXum+dBfgsBVMN+AgvOCCbguXyick6LJhpBszxMebJ8syA==
+  resolved "https://registry.npmjs.org/@typescript/typescript-win32-x64/-/typescript-win32-x64-7.0.2.tgz"
+  integrity sha512-0BQ3HkAHHlKLSp1qRvf3SUhGpGsDuhB/jgFw75guyqbxJqEaS0Cw/VFO8i2nHglJUzQCRtMMR/IBAKE3ETMC4g==
 
 "@ungap/structured-clone@^1.0.0":
   version "1.3.3"
@@ -5810,9 +5810,9 @@ focus-lock@^1.3.6:
     tslib "^2.0.3"
 
 follow-redirects@^1.16.0:
-  version "1.16.0"
-  resolved "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.16.0.tgz"
-  integrity sha512-y5rN/uOsadFT/JfYwhxRS5R7Qce+g3zG97+JrtFZlC9klX/W5hD7iiLzScI4nZqUS7DNUdhPgw4xI8W2LuXlUw==
+  version "1.16.1"
+  resolved "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.16.1.tgz"
+  integrity sha512-FNvFGzoMLWmE6Yj9spb/zjd7yiNCHiAW9/Tg9CXrQ8wuu32HtlJOwWO11OJafl5FfY3DxTdQ0vj42zU1kvv5jg==
 
 for-each@^0.3.3, for-each@^0.3.5:
   version "0.3.5"
@@ -5925,11 +5925,6 @@ fs.realpath@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz"
   integrity sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==
-
-fsevents@~2.3.2:
-  version "2.3.3"
-  resolved "https://registry.npmjs.org/fsevents/-/fsevents-2.3.3.tgz"
-  integrity sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==
 
 function-bind@^1.1.2:
   version "1.1.2"
